@@ -34,19 +34,19 @@ export const UrlShortener: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
       {/* Hero Section */}
       <div className="text-center mb-6 sm:mb-8 lg:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
           Shorten Your Links
         </h1>
-        <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Create short, memorable links that are easy to share and track.
         </p>
       </div>
       
       {/* URL Shortening Form */}
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 lg:p-8">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
         <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
           <div>
-            <label htmlFor="url-input" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="url-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Enter your long URL
             </label>
             <div className="relative">
@@ -56,7 +56,7 @@ export const UrlShortener: React.FC = () => {
                 value={longUrl}
                 onChange={(e) => setLongUrl(e.target.value)}
                 placeholder="https://example.com/very-long-url-that-needs-shortening"
-                className="w-full px-3 sm:px-4 py-3 sm:py-4 text-gray-900 placeholder-gray-500 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                className="w-full px-3 sm:px-4 py-3 sm:py-4 text-slate-800 dark:text-gray-100 placeholder-slate-500 dark:placeholder-gray-400 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600"
                 disabled={loading}
                 aria-describedby="url-help"
               />
@@ -66,7 +66,7 @@ export const UrlShortener: React.FC = () => {
                 </div>
               )}
             </div>
-            <p id="url-help" className="mt-2 text-sm text-gray-500">
+            <p id="url-help" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               We'll create a short, shareable link for you
             </p>
           </div>
@@ -79,10 +79,10 @@ export const UrlShortener: React.FC = () => {
                 type="checkbox"
                 checked={useCustomUrl}
                 onChange={(e) => setUseCustomUrl(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="w-4 h-4 text-blue-600 bg-gray-100 dark:bg-slate-700 border-gray-300 dark:border-slate-600 rounded focus:ring-blue-500 focus:ring-2"
                 disabled={loading}
               />
-              <label htmlFor="custom-url-checkbox" className="ml-2 text-sm font-medium text-gray-700">
+              <label htmlFor="custom-url-checkbox" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Create custom short link
               </label>
             </div>
@@ -90,26 +90,26 @@ export const UrlShortener: React.FC = () => {
             {/* Custom Code Input - Only shown when checkbox is checked */}
             {useCustomUrl && (
               <div className="animate-fade-in-up">
-                <label htmlFor="custom-code-input" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="custom-code-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Custom short code
                 </label>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-500 px-3 py-3 bg-gray-100 border border-gray-200 rounded-l-xl">
-                    {window.location.origin}/
-                  </span>
-                  <input
-                    id="custom-code-input"
-                    type="text"
-                    value={customCode}
-                    onChange={(e) => setCustomCode(e.target.value)}
-                    placeholder="my-custom-link"
-                    className="flex-1 px-3 sm:px-4 py-3 sm:py-4 text-gray-900 placeholder-gray-500 border border-gray-200 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                                <span className="text-sm text-slate-500 dark:text-gray-400 px-3 py-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-l-xl">
+                {window.location.origin}/
+              </span>
+              <input
+                id="custom-code-input"
+                type="text"
+                value={customCode}
+                onChange={(e) => setCustomCode(e.target.value)}
+                placeholder="my-custom-link"
+                className="flex-1 px-3 sm:px-4 py-3 sm:py-4 text-slate-800 dark:text-gray-100 placeholder-slate-500 dark:placeholder-gray-400 border border-slate-300 dark:border-slate-600 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600"
                     disabled={loading}
                     aria-describedby="custom-code-help"
                     pattern="[a-zA-Z0-9_-]{3,50}"
                   />
                 </div>
-                <p id="custom-code-help" className="mt-2 text-sm text-gray-500">
+                <p id="custom-code-help" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   3-50 characters: letters, numbers, hyphens, and underscores only
                 </p>
               </div>
@@ -134,15 +134,15 @@ export const UrlShortener: React.FC = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="mt-4 sm:mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mt-4 sm:mt-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-red-400 dark:text-red-500" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error.message}</p>
+                <p className="text-sm text-red-800 dark:text-red-200">{error.message}</p>
               </div>
             </div>
           </div>
@@ -150,17 +150,17 @@ export const UrlShortener: React.FC = () => {
 
         {/* Success Result */}
         {data && (
-          <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+          <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-200 dark:border-green-800 rounded-xl">
             <div className="flex items-center mb-3 sm:mb-4">
               <div className="flex-shrink-0">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               </div>
               <div className="ml-3">
-                <h3 className="text-base sm:text-lg font-semibold text-green-900">Your shortened link is ready!</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-green-900 dark:text-green-100">Your shortened link is ready!</h3>
               </div>
             </div>
             
@@ -171,23 +171,23 @@ export const UrlShortener: React.FC = () => {
                   value={data.short_url}
                   placeholder={data.short_url}
                   readOnly
-                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-900 font-mono bg-white border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-900 dark:text-gray-100 font-mono bg-white dark:bg-slate-700 border border-green-300 dark:border-green-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   aria-label="Shortened URL"
                 />
                 <button
                   onClick={() => copyToClipboard(data.short_url)}
-                  className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 font-medium whitespace-nowrap shadow-md hover:shadow-lg"
+                  className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition-all duration-300 font-medium whitespace-nowrap shadow-md hover:shadow-lg"
                   aria-label="Copy shortened URL"
                 >
                   Copy
                 </button>
               </div>
               
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-green-700 space-y-2 sm:space-y-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-green-700 dark:text-green-300 space-y-2 sm:space-y-0">
                 <span className="truncate">Original: {data.long_url}</span>
                 <button
                   onClick={reset}
-                  className="text-green-600 hover:text-green-800 underline whitespace-nowrap transition-colors duration-200"
+                  className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 underline whitespace-nowrap transition-colors duration-200"
                 >
                   Create another
                 </button>
@@ -200,33 +200,33 @@ export const UrlShortener: React.FC = () => {
       {/* Features Section */}
       <div className="mt-8 sm:mt-12 lg:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         <div className="text-center">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Lightning Fast</h3>
-          <p className="text-sm sm:text-base text-gray-600">Create short links instantly with our optimized service</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Lightning Fast</h3>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Create short links instantly with our optimized service</p>
         </div>
         
         <div className="text-center">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Secure & Reliable</h3>
-          <p className="text-sm sm:text-base text-gray-600">Your links are safe with enterprise-grade security</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Secure & Reliable</h3>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Your links are safe with enterprise-grade security</p>
         </div>
         
         <div className="text-center sm:col-span-2 lg:col-span-1">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Analytics Ready</h3>
-          <p className="text-sm sm:text-base text-gray-600">Track clicks and engagement with detailed analytics</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">Analytics Ready</h3>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Track clicks and engagement with detailed analytics</p>
         </div>
       </div>
     </div>
