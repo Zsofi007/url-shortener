@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 #root {
   margin: 0 auto;
@@ -51,13 +52,25 @@
   background: #f1f5f9;
 }
 
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 /* Smooth transitions */
@@ -70,6 +83,11 @@
 /* Focus styles for better accessibility */
 *:focus {
   outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+[data-theme="dark"] *:focus {
+  outline: 2px solid #60a5fa;
   outline-offset: 2px;
 }
 
@@ -94,6 +112,11 @@
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .glass {
+  background: rgba(30, 41, 59, 0.25);
+  border: 1px solid rgba(100, 116, 139, 0.18);
 }
 
 /* Gradient text */
