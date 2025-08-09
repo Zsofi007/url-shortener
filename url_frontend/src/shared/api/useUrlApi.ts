@@ -1,25 +1,23 @@
 import { useApi } from '../hooks/useApi';
 import * as urlApiService from './urlApi.service';
-import type { ShortenedUrl } from './urlApi.service';
+import type { ShortenedUrl, ShortenUrlRequest, CustomUrlRequest } from './urlApi.service';
 
 export const useUrlApi = () => {
-  // Shorten URL
+  // Shorten URL with custom limits
   const {
     loading: isUrlShortenerLoading,
     data: shortenedUrl,
     error: urlShortenerError,
     execute: shortenUrl
-  } = useApi<string, ShortenedUrl>(urlApiService.shortenUrl);
+  } = useApi<ShortenUrlRequest, ShortenedUrl>(urlApiService.shortenUrl);
 
-  // Custom URL
+  // Custom URL with custom limits
   const {
     loading: isCustomUrlLoading,
     data: customUrl,
     error: customUrlError,
-    execute: createCustomUrlExecute
-  } = useApi<{ longUrl: string; customCode: string }, ShortenedUrl>(
-    ({ longUrl, customCode }) => urlApiService.createCustomUrl(longUrl, customCode)
-  );
+    execute: createCustomUrl
+  } = useApi<CustomUrlRequest, ShortenedUrl>(urlApiService.createCustomUrl);
 
   return {
     state: {
@@ -32,7 +30,7 @@ export const useUrlApi = () => {
     },
     actions: {
       shortenUrl,
-      createCustomUrl: createCustomUrlExecute
+      createCustomUrl
     }
   };
 }; 

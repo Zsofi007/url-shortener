@@ -1,0 +1,120 @@
+{
+  "info": {
+    "name": "URL Shortener API",
+    "description": "FastAPI URL Shortener with custom limits",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Shortened URL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"long_url\": \"https://www.google.com\",\n  \"expires_in_days\": 7,\n  \"max_clicks\": 10\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shorten",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "shorten"]
+        },
+        "description": "Create a shortened URL with custom expiration and click limits"
+      },
+      "response": []
+    },
+    {
+      "name": "Create Custom URL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"long_url\": \"https://www.example.com\",\n  \"custom_code\": \"my-custom-link\",\n  \"expires_in_days\": 14,\n  \"max_clicks\": 50\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/custom",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "custom"]
+        },
+        "description": "Create a custom short URL with user-specified code and limits"
+      },
+      "response": []
+    },
+    {
+      "name": "Redirect to Long URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/abc123",
+          "host": ["{{baseUrl}}"],
+          "path": ["abc123"]
+        },
+        "description": "Redirect to the original long URL using short code"
+      },
+      "response": []
+    },
+    {
+      "name": "Manual Cleanup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/cleanup",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "cleanup"]
+        },
+        "description": "Manually trigger cleanup of expired URLs"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

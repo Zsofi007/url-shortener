@@ -8,3 +8,6 @@ class URL(SQLModel, table=True):
     short_code: Optional[str] = Field(default=None, index=True)
     long_url:str = Field(max_length=2048)
     created_at:datetime = Field(default_factory=datetime.utcnow)
+    expires_at: Optional[datetime] = None
+    max_clicks: Optional[int] = Field(default=10)
+    clicks: int = Field(default=0)

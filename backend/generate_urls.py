@@ -3,7 +3,7 @@
 Generate 100 sample URLs and add them to the database
 """
 import random
-from app.db import get_session, create_db_and_tables
+from app.db import get_session, create_db_and_tables, drop_tables
 from app.models.url import URL
 from app.utils.utils import encode_base62
 
@@ -124,6 +124,9 @@ sample_urls = [
 
 def generate_urls():
     """Generate 100 URLs and add them to the database"""
+    # print("Dropping existing tables...")
+    # drop_tables()
+    
     print("Creating database tables...")
     create_db_and_tables()
     
