@@ -4,40 +4,60 @@ export interface ShortenedUrl {
   short_code: string;
   long_url: string;
   short_url: string;
+  expires_at: string;
+  max_clicks: number;
+  clicks: number;
+  created_at: string;
 }
 
-// Shorten a URL
-export const shortenUrl = async (longUrl: string): Promise<ShortenedUrl> => {
-  console.log(longUrl);
-  const response = await fetch(`${API_BASE_URL}/api/shorten?long_url=${longUrl}`, {
+export interface ShortenUrlRequest {
+  long_url: string;
+  expires_in_days?: number;
+  max_clicks?: number;
+}
+
+export interface CustomUrlRequest {
+  long_url: string;
+  custom_code: string;
+  expires_in_days?: number;
+  max_clicks?: number;
+}
+
+// Shorten a URL with custom limits
+export const shortenUrl = async (request: ShortenUrlRequest): Promise<ShortenedUrl> => {
+  console.log('Shortening URL with request:', request);
+  const response = await fetch(`${API_BASE_URL}/api/shorten`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to shorten URL');
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to shorten URL');
   }
 
   const data = await response.json();
-  console.log(data);
-  // Transform the response to match our interface
+  console.log('Shorten URL response:', data);
+  
+  // Transform the response to include short_url
   return {
-    short_code: data.short_code,
-    long_url: longUrl,
+    ...data,
     short_url: `${API_BASE_URL}/${data.short_code}`
   };
 };
 
-// Create a custom URL
-export const createCustomUrl = async (longUrl: string, customCode: string): Promise<ShortenedUrl> => {
-  console.log('Creating custom URL:', { longUrl, customCode });
-  const response = await fetch(`${API_BASE_URL}/api/custom?long_url=${encodeURIComponent(longUrl)}&custom_code=${encodeURIComponent(customCode)}`, {
+// Create a custom URL with custom limits
+export const createCustomUrl = async (request: CustomUrlRequest): Promise<ShortenedUrl> => {
+  console.log('Creating custom URL with request:', request);
+  const response = await fetch(`${API_BASE_URL}/api/custom`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) {
@@ -48,10 +68,9 @@ export const createCustomUrl = async (longUrl: string, customCode: string): Prom
   const data = await response.json();
   console.log('Custom URL response:', data);
   
-  // Return the response (already matches our interface)
+  // Transform the response to include short_url
   return {
-    short_code: data.short_code,
-    long_url: data.long_url,
-    short_url: data.short_url
+    ...data,
+    short_url: `${API_BASE_URL}/${data.short_code}`
   };
 };
