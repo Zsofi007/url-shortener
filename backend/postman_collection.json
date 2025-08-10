@@ -1,100 +1,587 @@
 {
   "info": {
-    "name": "URL Shortener API",
-    "description": "FastAPI URL Shortener with custom limits",
+    "name": "URL Shortener API with Authentication",
+    "description": "FastAPI URL Shortener with Supabase authentication, custom limits, and user management",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8000",
       "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userEmail",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
     {
-      "name": "Create Shortened URL",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"long_url\": \"https://www.google.com\",\n  \"expires_in_days\": 7,\n  \"max_clicks\": 10\n}"
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.access_token) {",
+                  "        pm.collectionVariables.set('accessToken', response.access_token);",
+                  "        pm.collectionVariables.set('userId', response.user_id);",
+                  "        pm.collectionVariables.set('userEmail', response.email);",
+                  "        console.log('User registered and logged in automatically');",
+                  "    } else {",
+                  "        console.log('User registered, email confirmation required');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"testpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account. Email confirmation may be required depending on Supabase settings."
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/api/shorten",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "shorten"]
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.access_token);",
+                  "    pm.collectionVariables.set('userId', response.user_id);",
+                  "    pm.collectionVariables.set('userEmail', response.email);",
+                  "    console.log('User logged in successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"testpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticate user and create session. Email must be confirmed before login."
+          },
+          "response": []
         },
-        "description": "Create a shortened URL with custom expiration and click limits"
-      },
-      "response": []
+        {
+          "name": "Get User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('User profile:', response);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            },
+            "description": "Get current user's profile information. Requires valid JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('Token is valid:', response);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "verify"]
+            },
+            "description": "Verify if JWT token is valid and return user data."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('accessToken', '');",
+                  "    pm.collectionVariables.set('userId', '');",
+                  "    pm.collectionVariables.set('userEmail', '');",
+                  "    console.log('User logged out successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout user and invalidate session. Requires valid JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Email (Callback)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.access_token) {",
+                  "        pm.collectionVariables.set('accessToken', response.access_token);",
+                  "        pm.collectionVariables.set('userId', response.user.user_id);",
+                  "        pm.collectionVariables.set('userEmail', response.user.email);",
+                  "        console.log('Email confirmed and user logged in automatically');",
+                  "    }",
+                  "    console.log('Email confirmation response:', response);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/confirm?access_token=YOUR_ACCESS_TOKEN_HERE&expires_at=1754839670&expires_in=3600&refresh_token=7fxlj2g2mqqx&token_type=bearer&type=signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "confirm"],
+              "query": [
+                {
+                  "key": "access_token",
+                  "value": "YOUR_ACCESS_TOKEN_HERE",
+                  "description": "Replace with actual access token from email confirmation link"
+                },
+                {
+                  "key": "expires_at",
+                  "value": "1754839670"
+                },
+                {
+                  "key": "expires_in",
+                  "value": "3600"
+                },
+                {
+                  "key": "refresh_token",
+                  "value": "7fxlj2g2mqqx"
+                },
+                {
+                  "key": "token_type",
+                  "value": "bearer"
+                },
+                {
+                  "key": "type",
+                  "value": "signup"
+                }
+              ]
+            },
+            "description": "Handle email confirmation redirect from Supabase. Replace 'YOUR_ACCESS_TOKEN_HERE' with the actual token from your email confirmation link. This endpoint will verify the token and return user information."
+          },
+          "response": []
+        },
+        {
+          "name": "Auth Callback",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.access_token) {",
+                  "        pm.collectionVariables.set('accessToken', response.access_token);",
+                  "        pm.collectionVariables.set('userId', response.user.user_id);",
+                  "        pm.collectionVariables.set('userEmail', response.user.email);",
+                  "        console.log('Authentication successful via callback');",
+                  "    }",
+                  "    console.log('Callback response:', response);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/callback?access_token=YOUR_ACCESS_TOKEN_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "callback"],
+              "query": [
+                {
+                  "key": "access_token",
+                  "value": "YOUR_ACCESS_TOKEN_HERE",
+                  "description": "Replace with actual access token"
+                }
+              ]
+            },
+            "description": "General authentication callback endpoint for various auth flows. Replace 'YOUR_ACCESS_TOKEN_HERE' with the actual token."
+          },
+          "response": []
+        },
+        {
+          "name": "HTML Callback Page",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/callback-page",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "callback-page"]
+            },
+            "description": "HTML page that handles URL fragments and automatically processes email confirmation. Use this URL in your Supabase redirect settings to handle tokens sent in URL fragments."
+          },
+          "response": []
+        }
+      ]
     },
     {
-      "name": "Create Custom URL",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"long_url\": \"https://www.example.com\",\n  \"custom_code\": \"my-custom-link\",\n  \"expires_in_days\": 14,\n  \"max_clicks\": 50\n}"
+      "name": "URL Management",
+      "item": [
+        {
+          "name": "Create Shortened URL (Guest)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('URL created as guest:', response.short_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_url\": \"https://www.google.com\",\n  \"expires_in_days\": 7,\n  \"max_clicks\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/shorten",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "shorten"]
+            },
+            "description": "Create a shortened URL as a guest user (no authentication required)."
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/api/custom",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "custom"]
+        {
+          "name": "Create Shortened URL (Authenticated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('URL created as authenticated user:', response.short_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_url\": \"https://www.github.com\",\n  \"expires_in_days\": 14,\n  \"max_clicks\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/shorten",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "shorten"]
+            },
+            "description": "Create a shortened URL as an authenticated user. URL will be tied to the user's account."
+          },
+          "response": []
         },
-        "description": "Create a custom short URL with user-specified code and limits"
-      },
-      "response": []
-    },
-    {
-      "name": "Redirect to Long URL",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/abc123",
-          "host": ["{{baseUrl}}"],
-          "path": ["abc123"]
+        {
+          "name": "Create Custom URL (Guest)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('Custom URL created as guest:', response.short_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_url\": \"https://www.example.com\",\n  \"custom_code\": \"guest-link\",\n  \"expires_in_days\": 7,\n  \"max_clicks\": 15\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/custom",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "custom"]
+            },
+            "description": "Create a custom short URL as a guest user (no authentication required)."
+          },
+          "response": []
         },
-        "description": "Redirect to the original long URL using short code"
-      },
-      "response": []
-    },
-    {
-      "name": "Manual Cleanup",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
+        {
+          "name": "Create Custom URL (Authenticated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('Custom URL created as authenticated user:', response.short_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_url\": \"https://www.stackoverflow.com\",\n  \"custom_code\": \"my-stack\",\n  \"expires_in_days\": 30,\n  \"max_clicks\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/custom",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "custom"]
+            },
+            "description": "Create a custom short URL as an authenticated user. URL will be tied to the user's account."
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{baseUrl}}/api/cleanup",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "cleanup"]
+        {
+          "name": "Generate QR Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('QR code generated for:', response.short_code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"short_code\": \"abc123\",\n  \"size\": 200\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/qr-code",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "qr-code"]
+            },
+            "description": "Generate a QR code for an existing short URL. Replace 'abc123' with an actual short code from your URLs."
+          },
+          "response": []
         },
-        "description": "Manually trigger cleanup of expired URLs"
-      },
-      "response": []
+        {
+          "name": "Redirect to Long URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 302) {",
+                  "    console.log('Redirect successful');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/abc123",
+              "host": ["{{baseUrl}}"],
+              "path": ["abc123"]
+            },
+            "description": "Redirect to the original long URL using short code. Replace 'abc123' with an actual short code."
+          },
+          "response": []
+        },
+        {
+          "name": "Manual Cleanup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    console.log('Cleanup completed:', response.deleted_count, 'URLs deleted');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cleanup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cleanup"]
+            },
+            "description": "Manually trigger cleanup of expired URLs. Returns the number of URLs that were deleted."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -103,16 +590,11 @@
       "script": {
         "type": "text/javascript",
         "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
+          "// Set default headers for all requests",
+          "pm.request.headers.add({",
+          "    key: 'Accept',",
+          "    value: 'application/json'",
+          "});"
         ]
       }
     }

@@ -35,14 +35,21 @@ export interface QrCodeResponse {
   short_url: string;
 }
 
+// Helper function to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('accessToken');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
 // Shorten a URL with custom limits
 export const shortenUrl = async (request: ShortenUrlRequest): Promise<ShortenedUrl> => {
   console.log('Shortening URL with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/shorten`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
@@ -66,9 +73,7 @@ export const createCustomUrl = async (request: CustomUrlRequest): Promise<Shorte
   console.log('Creating custom URL with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/custom`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
@@ -92,9 +97,7 @@ export const generateQrCode = async (request: QrCodeRequest): Promise<QrCodeResp
   console.log('Generating QR code with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/qr-code`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
