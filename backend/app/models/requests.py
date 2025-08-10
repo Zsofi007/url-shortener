@@ -83,6 +83,7 @@ class UrlResponse(BaseModel):
     clicks: int = Field(default=0, description="Current click count")
     created_at: datetime = Field(..., description="When the URL was created")
     qr_code_data: Optional[str] = Field(default=None, description="Base64 encoded QR code image data")
+    short_url: str = Field(..., description="The complete short URL")
 
 
 class QrCodeResponse(BaseModel):

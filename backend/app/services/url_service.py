@@ -1,7 +1,7 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from fastapi import HTTPException
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 
 from app.models.url import URL
 from app.models.requests import ShortenUrlRequest, CustomUrlRequest, QrCodeRequest
@@ -18,6 +18,117 @@ class URLService:
     def _generate_short_url(self, short_code: str) -> str:
         """Generate the full short URL using the configured base URL"""
         return f"{settings.BASE_URL}/{short_code}"
+
+    def get_user_urls_count(
+        self, 
+        user_id: str, 
+        search: Optional[str] = None
+    ) -> int:
+        """
+        Get the total count of URLs for a specific user
+        
+        Args:
+            user_id: User ID to filter URLs by
+            search: Optional search term for long_url or short_code
+            
+        Returns:
+            Total count of URLs matching the criteria
+        """
+        try:
+            # Build base query - only URLs belonging to this user
+            query = select(func.count(URL.id)).where(URL.user_id == user_id)
+            
+            # Add search filter if provided
+            if search:
+                search_filter = (
+                    (URL.long_url.ilike(f"%{search}%")) | 
+                    (URL.short_code.ilike(f"%{search}%"))
+                )
+                query = query.where(search_filter)
+            
+            # Execute count query
+            count = self.session.exec(query).first()
+            return count or 0
+            
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error counting user URLs: {str(e)}")
+
+    def list_user_urls(
+        self, 
+        user_id: str, 
+        page: int = 1, 
+        page_size: int = 20,
+        search: Optional[str] = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc"
+    ) -> List[UrlResponse]:
+        """
+        List all shortened URLs for a specific user with pagination, search, and sorting
+        
+        Args:
+            user_id: User ID to filter URLs by
+            page: Page number (1-based)
+            page_size: Items per page
+            search: Optional search term for long_url or short_code
+            sort_by: Field to sort by (created_at, clicks, expires_at)
+            sort_order: Sort direction (asc or desc)
+            
+        Returns:
+            List of UrlResponse objects
+        """
+        try:
+            # Build base query - only URLs belonging to this user
+            query = select(URL).where(URL.user_id == user_id)
+            
+            # Add search filter if provided
+            if search:
+                search_filter = (
+                    (URL.long_url.ilike(f"%{search}%")) | 
+                    (URL.short_code.ilike(f"%{search}%"))
+                )
+                query = query.where(search_filter)
+            
+            # Add sorting
+            if sort_by == "clicks":
+                sort_field = URL.clicks
+            elif sort_by == "expires_at":
+                sort_field = URL.expires_at
+            else:  # default to created_at
+                sort_field = URL.created_at
+                
+            if sort_order.lower() == "asc":
+                query = query.order_by(sort_field.asc())
+            else:
+                query = query.order_by(sort_field.desc())
+            
+            # Add pagination
+            offset = (page - 1) * page_size
+            query = query.offset(offset).limit(page_size)
+            
+            # Execute query
+            urls = self.session.exec(query).all()
+            
+            # Convert to response models
+            result = []
+            for url in urls:
+                short_url = self._generate_short_url(url.short_code)
+                qr_code_data = generate_qr_code(short_url)
+                
+                result.append(UrlResponse(
+                    short_code=url.short_code,
+                    long_url=url.long_url,
+                    expires_at=url.expires_at,
+                    max_clicks=url.max_clicks,
+                    clicks=url.clicks,
+                    created_at=url.created_at,
+                    qr_code_data=qr_code_data,
+                    short_url=short_url
+                ))
+            
+            return result
+            
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error listing user URLs: {str(e)}")
 
     def shorten_url(self, request: ShortenUrlRequest, user_id: Optional[str] = None) -> UrlResponse:
         """
@@ -59,7 +170,8 @@ class URLService:
                 max_clicks=new_url_entry.max_clicks,
                 clicks=new_url_entry.clicks,
                 created_at=new_url_entry.created_at,
-                qr_code_data=qr_code_data
+                qr_code_data=qr_code_data,
+                short_url=short_url
             )
             
         except Exception as e:

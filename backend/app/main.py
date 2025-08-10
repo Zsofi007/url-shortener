@@ -2,7 +2,7 @@ from app.routers import url, auth
 from app.config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.db import create_db_and_tables
+from app.db import create_tables
 from app.tasks.cleanup import startup_cleanup, periodic_cleanup
 from contextlib import asynccontextmanager
 import asyncio
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("App is starting up")
-    create_db_and_tables()
+    create_tables()
     
     # Run initial cleanup
     await startup_cleanup()

@@ -1,42 +1,61 @@
-from sqlmodel import create_engine, Session, SQLModel
-from app.models.url import URL
-from app.utils.utils import encode_base62
+from sqlmodel import SQLModel, create_engine, Session
+from sqlalchemy import text
 from app.config import settings
 
-# Use PostgreSQL connection from Supabase pooler
-engine = create_engine(settings.DATABASE_URL, echo=True)
+# Database engine
+engine = create_engine(settings.DATABASE_URL, echo=settings.DEBUG)
 
-
-def create_db_and_tables():
+def create_tables():
+    """Create all tables defined in SQLModel"""
     SQLModel.metadata.create_all(engine)
 
-
-def drop_tables():
-    """Drop all tables - use with caution!"""
-    SQLModel.metadata.drop_all(engine)
-
+def create_indexes():
+    """Create database indexes for optimal performance"""
+    with Session(engine) as session:
+        # Index for user_id (most important for user URL queries)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_user_id 
+            ON url (user_id);
+        """))
+        
+        # Composite index for user_id + created_at (for sorting by creation date)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_user_created 
+            ON url (user_id, created_at DESC);
+        """))
+        
+        # Composite index for user_id + clicks (for sorting by click count)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_user_clicks 
+            ON url (user_id, clicks DESC);
+        """))
+        
+        # Composite index for user_id + expires_at (for sorting by expiration)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_user_expires 
+            ON url (user_id, expires_at ASC);
+        """))
+        
+        # Index for short_code (for redirect lookups)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_short_code 
+            ON url (short_code);
+        """))
+        
+        # Index for expires_at (for cleanup tasks)
+        session.exec(text("""
+            CREATE INDEX IF NOT EXISTS idx_urls_expires_at 
+            ON url (expires_at);
+        """))
+        
+        session.commit()
 
 def get_session():
+    """Get database session"""
     with Session(engine) as session:
-        return session 
+        yield session
 
+# Initialize database
 if __name__ == "__main__":
-    print("Dropping existing tables...")
-    drop_tables()
-    
-    print("Creating new tables...")
-    create_db_and_tables()
-    
-    session = get_session()
-    
-    new_url_entry = URL(long_url="https://www.google.com")
-    session.add(new_url_entry)
-    session.commit()
-    session.refresh(new_url_entry)
-
-    new_url_entry.short_code = encode_base62(new_url_entry.id)
-
-    session.add(new_url_entry)
-    session.commit()
-
-    print(f"Short URL: http://localhost:8000/shorten/{new_url_entry.short_code}")
+    create_tables()
+    create_indexes()

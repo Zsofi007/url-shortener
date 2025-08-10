@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.models.url import URL
 from app.models.requests import ShortenUrlRequest, CustomUrlRequest, UrlResponse, QrCodeRequest, QrCodeResponse
 from app.services.url_service import URLService
 from app.db import get_session
-from app.utils.auth_middleware import get_optional_user
+from app.utils.auth_middleware import get_optional_user, get_required_user
 from sqlmodel import Session
 from fastapi.responses import RedirectResponse
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 router = APIRouter()
 
@@ -55,6 +55,58 @@ async def create_custom_url(
     url_service = URLService(session)
     user_id = current_user["user_id"] if current_user else None
     return url_service.create_custom_url(request, user_id)
+
+
+@router.get("/api/urls", response_model=List[UrlResponse])
+async def list_user_urls(
+    session: Session = Depends(get_session),
+    current_user: Dict[str, Any] = Depends(get_required_user),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page (max 100)"),
+    search: Optional[str] = Query(None, description="Search in long_url or short_code"),
+    sort_by: str = Query("created_at", description="Sort field: created_at, clicks, expires_at"),
+    sort_order: str = Query("desc", description="Sort order: asc or desc")
+):
+    """
+    List all shortened URLs for the authenticated user
+    
+    - **page**: Page number (1-based)
+    - **page_size**: Items per page (1-100)
+    - **search**: Optional search term for long_url or short_code
+    - **sort_by**: Field to sort by (created_at, clicks, expires_at)
+    - **sort_order**: Sort direction (asc or desc)
+    
+    Authentication is required - users can only see their own URLs
+    """
+    url_service = URLService(session)
+    return url_service.list_user_urls(
+        user_id=current_user["user_id"],
+        page=page,
+        page_size=page_size,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order
+    )
+
+
+@router.get("/api/urls/count")
+async def get_user_urls_count(
+    session: Session = Depends(get_session),
+    current_user: Dict[str, Any] = Depends(get_required_user),
+    search: Optional[str] = Query(None, description="Search in long_url or short_code")
+):
+    """
+    Get the total count of URLs for the authenticated user
+    
+    - **search**: Optional search term for long_url or short_code
+    
+    Authentication is required - users can only see their own URL counts
+    """
+    url_service = URLService(session)
+    return url_service.get_user_urls_count(
+        user_id=current_user["user_id"],
+        search=search
+    )
 
 
 @router.post("/api/qr-code", response_model=QrCodeResponse)
