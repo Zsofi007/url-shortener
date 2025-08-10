@@ -1,4 +1,5 @@
 import React from 'react';
+import { QrCodeDisplay } from '../QrCodeDisplay/QrCodeDisplay';
 
 interface ShortenedUrl {
   short_code: string;
@@ -8,6 +9,7 @@ interface ShortenedUrl {
   max_clicks: number;
   clicks: number;
   created_at: string;
+  qr_code_data?: string;
 }
 
 interface SuccessMessageProps {
@@ -93,6 +95,15 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset })
           </div>
         </div>
       </div>
+      
+      {/* QR Code Display */}
+      {data.qr_code_data && (
+        <QrCodeDisplay
+          qrCodeData={data.qr_code_data}
+          shortUrl={data.short_url}
+          shortCode={data.short_code}
+        />
+      )}
     </div>
   );
 };

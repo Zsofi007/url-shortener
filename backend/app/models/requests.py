@@ -68,6 +68,12 @@ class CustomUrlRequest(BaseModel):
         return v
 
 
+class QrCodeRequest(BaseModel):
+    """Request model for QR code generation"""
+    short_code: str = Field(..., description="The short code to generate QR code for")
+    size: Optional[int] = Field(default=200, ge=100, le=500, description="QR code size in pixels (100-500, default: 200)")
+
+
 class UrlResponse(BaseModel):
     """Response model for URL creation"""
     short_code: str = Field(..., description="The generated short code")
@@ -76,3 +82,11 @@ class UrlResponse(BaseModel):
     max_clicks: int = Field(..., description="Maximum allowed clicks")
     clicks: int = Field(default=0, description="Current click count")
     created_at: datetime = Field(..., description="When the URL was created")
+    qr_code_data: Optional[str] = Field(default=None, description="Base64 encoded QR code image data")
+
+
+class QrCodeResponse(BaseModel):
+    """Response model for QR code generation"""
+    short_code: str = Field(..., description="The short code")
+    qr_code_data: str = Field(..., description="Base64 encoded QR code image data")
+    short_url: str = Field(..., description="The complete short URL")

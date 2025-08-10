@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.models.url import URL
-from app.models.requests import ShortenUrlRequest, CustomUrlRequest, UrlResponse
-from app.utils.utils import encode_base62
+from app.models.requests import ShortenUrlRequest, CustomUrlRequest, UrlResponse, QrCodeRequest, QrCodeResponse
+from app.utils.utils import encode_base62, generate_qr_code
 from app.db import get_session
 from app.tasks.cleanup import cleanup_expired_urls
 from sqlmodel import Session, select
@@ -41,13 +41,18 @@ def shorten_url(request: ShortenUrlRequest, session: Session = Depends(get_sessi
         session.commit()
         session.refresh(new_url_entry)
 
+        # Generate QR code for the short URL
+        short_url = f"http://localhost:8000/{new_url_entry.short_code}"
+        qr_code_data = generate_qr_code(short_url)
+
         return UrlResponse(
             short_code=new_url_entry.short_code,
             long_url=new_url_entry.long_url,
             expires_at=new_url_entry.expires_at,
             max_clicks=new_url_entry.max_clicks,
             clicks=new_url_entry.clicks,
-            created_at=new_url_entry.created_at
+            created_at=new_url_entry.created_at,
+            qr_code_data=qr_code_data
         )
         
     except Exception as e:
@@ -85,13 +90,18 @@ def create_custom_url(request: CustomUrlRequest, session: Session = Depends(get_
         session.commit()
         session.refresh(new_url_entry)
         
+        # Generate QR code for the short URL
+        short_url = f"http://localhost:8000/{new_url_entry.short_code}"
+        qr_code_data = generate_qr_code(short_url)
+        
         return UrlResponse(
             short_code=new_url_entry.short_code,
             long_url=new_url_entry.long_url,
             expires_at=new_url_entry.expires_at,
             max_clicks=new_url_entry.max_clicks,
             clicks=new_url_entry.clicks,
-            created_at=new_url_entry.created_at
+            created_at=new_url_entry.created_at,
+            qr_code_data=qr_code_data
         )
         
     except HTTPException:
@@ -100,6 +110,47 @@ def create_custom_url(request: CustomUrlRequest, session: Session = Depends(get_
     except Exception as e:
         session.rollback()
         raise HTTPException(status_code=500, detail=f"Error creating custom URL: {str(e)}")
+
+
+@router.post("/api/qr-code", response_model=QrCodeResponse)
+def generate_qr_code_for_url(request: QrCodeRequest, session: Session = Depends(get_session)):
+    """
+    Generate a QR code for an existing short URL
+    
+    - **short_code**: The short code to generate QR code for
+    - **size**: QR code size in pixels (100-500, default: 200)
+    """
+    try:
+        # Check if URL exists
+        url_entry = session.exec(select(URL).where(URL.short_code == request.short_code)).first()
+        if not url_entry:
+            raise HTTPException(status_code=404, detail="Short URL not found")
+        
+        # Check if URL has expired
+        if url_entry.expires_at and url_entry.expires_at < datetime.utcnow():
+            raise HTTPException(status_code=410, detail="Short URL has expired")
+        
+        # Check if URL has reached max clicks
+        if url_entry.max_clicks and url_entry.clicks >= url_entry.max_clicks:
+            raise HTTPException(status_code=410, detail="Short URL has reached maximum clicks")
+        
+        # Generate short URL
+        short_url = f"http://localhost:8000/{url_entry.short_code}"
+        
+        # Generate QR code
+        qr_code_data = generate_qr_code(short_url, request.size)
+        
+        return QrCodeResponse(
+            short_code=url_entry.short_code,
+            qr_code_data=qr_code_data,
+            short_url=short_url
+        )
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating QR code: {str(e)}")
 
 
 
