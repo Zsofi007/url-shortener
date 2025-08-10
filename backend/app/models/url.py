@@ -11,3 +11,4 @@ class URL(SQLModel, table=True):
     expires_at: Optional[datetime] = None
     max_clicks: Optional[int] = Field(default=10)
     clicks: int = Field(default=0)
+    user_id: Optional[str] = Field(default=None, index=True, description="User ID if created by authenticated user")

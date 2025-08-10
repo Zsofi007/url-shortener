@@ -90,3 +90,49 @@ class QrCodeResponse(BaseModel):
     short_code: str = Field(..., description="The short code")
     qr_code_data: str = Field(..., description="Base64 encoded QR code image data")
     short_url: str = Field(..., description="The complete short URL")
+
+
+# Authentication Models
+class UserRegistrationRequest(BaseModel):
+    """Request model for user registration"""
+    email: str = Field(..., description="User's email address")
+    password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
+    
+    @validator('email')
+    def validate_email(cls, v):
+        """Basic email validation"""
+        import re
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', v):
+            raise ValueError('Invalid email format')
+        return v.lower()
+
+
+class UserLoginRequest(BaseModel):
+    """Request model for user login"""
+    email: str = Field(..., description="User's email address")
+    password: str = Field(..., description="User's password")
+    
+    @validator('email')
+    def validate_email(cls, v):
+        """Basic email validation"""
+        import re
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', v):
+            raise ValueError('Invalid email format')
+        return v.lower()
+
+
+class AuthResponse(BaseModel):
+    """Response model for authentication operations"""
+    user_id: str = Field(..., description="Unique user identifier")
+    email: str = Field(..., description="User's email address")
+    access_token: str = Field(..., description="JWT access token")
+    token_type: str = Field(default="bearer", description="Token type")
+    expires_in: int = Field(..., description="Token expiry time in seconds")
+
+
+class UserProfileResponse(BaseModel):
+    """Response model for user profile information"""
+    user_id: str = Field(..., description="Unique user identifier")
+    email: str = Field(..., description="User's email address")
+    created_at: datetime = Field(..., description="When the account was created")
+    email_confirmed: bool = Field(..., description="Whether email has been confirmed")
