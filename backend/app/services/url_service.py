@@ -218,7 +218,8 @@ class URLService:
                 max_clicks=new_url_entry.max_clicks,
                 clicks=new_url_entry.clicks,
                 created_at=new_url_entry.created_at,
-                qr_code_data=qr_code_data
+                qr_code_data=qr_code_data,
+                short_url=short_url
             )
             
         except HTTPException:

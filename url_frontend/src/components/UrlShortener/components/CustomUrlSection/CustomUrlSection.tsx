@@ -1,4 +1,5 @@
 import React from 'react';
+import { API_BASE_URL } from '../../../../config/api';
 
 interface CustomUrlSectionProps {
   useCustomUrl: boolean;
@@ -39,7 +40,7 @@ export const CustomUrlSection: React.FC<CustomUrlSectionProps> = ({
           </label>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-slate-500 dark:text-gray-400 px-3 py-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-l-xl">
-              {window.location.origin}/
+              {API_BASE_URL}/
             </span>
             <input
               id="custom-code-input"

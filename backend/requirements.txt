@@ -3,7 +3,8 @@ uvicorn[standard]
 sqlmodel
 psycopg2-binary
 python-multipart
-python-dotenv
 qrcode[pil]
 Pillow
 supabase
+# Production dependencies
+gunicorn

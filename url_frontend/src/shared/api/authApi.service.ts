@@ -5,7 +5,7 @@ import type {
   UserProfileResponse 
 } from './types.ts';
 
-const API_BASE_URL = 'http://localhost:8000';
+import { API_BASE_URL } from '../../config/api';
 
 // Helper function for API calls
 async function apiCall<T>(

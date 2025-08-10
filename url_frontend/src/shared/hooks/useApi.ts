@@ -7,17 +7,6 @@ interface ApiResponse<T, S> {
     execute: (payload: T) => Promise<S | null>;
 }
 
-interface ApiState<T> {
-  data: T | null;
-  error: string | null;
-  loading: boolean;
-}
-
-interface ApiActions<T> {
-  execute: (payload: T) => Promise<void>;
-  reset: () => void;
-}
-
 export function useApi<T, S>(
   apiFunction: (payload: T) => Promise<S>
 ): ApiResponse<T, S> {
