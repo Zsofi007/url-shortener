@@ -35,6 +35,33 @@ export interface QrCodeResponse {
   short_url: string;
 }
 
+export interface UserUrl {
+  short_code: string;
+  long_url: string;
+  short_url: string;
+  expires_at: string;
+  max_clicks: number;
+  clicks: number;
+  created_at: string;
+  qr_code_data?: string;
+}
+
+export interface UserUrlsResponse {
+  urls: UserUrl[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface ListUrlsParams {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  sort_by?: 'created_at' | 'clicks' | 'expires_at';
+  sort_order?: 'asc' | 'desc';
+}
+
 // Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken');
@@ -42,6 +69,61 @@ const getAuthHeaders = () => {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
+};
+
+// Get user URLs with pagination, search, and sorting
+export const getUserUrls = async (params: ListUrlsParams = {}): Promise<UserUrlsResponse> => {
+  const searchParams = new URLSearchParams();
+  
+  if (params.page) searchParams.append('page', params.page.toString());
+  if (params.page_size) searchParams.append('page_size', params.page_size.toString());
+  if (params.search) searchParams.append('search', params.search);
+  if (params.sort_by) searchParams.append('sort_by', params.sort_by);
+  if (params.sort_order) searchParams.append('sort_order', params.sort_order);
+
+  const response = await fetch(`${API_BASE_URL}/api/urls?${searchParams.toString()}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to fetch user URLs');
+  }
+
+  const urls = await response.json();
+  
+  // Calculate pagination info
+  const total = await getUserUrlsCount(params.search);
+  const page = params.page || 1;
+  const page_size = params.page_size || 20;
+  const total_pages = Math.ceil(total / page_size);
+
+  return {
+    urls,
+    total,
+    page,
+    page_size,
+    total_pages
+  };
+};
+
+// Get total count of user URLs
+export const getUserUrlsCount = async (search?: string): Promise<number> => {
+  const searchParams = new URLSearchParams();
+  if (search) searchParams.append('search', search);
+
+  const response = await fetch(`${API_BASE_URL}/api/urls/count?${searchParams.toString()}`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to fetch URL count');
+  }
+
+  return response.json();
 };
 
 // Shorten a URL with custom limits

@@ -1,0 +1,88 @@
+/* Dashboard Smooth Transitions */
+
+/* Form Controls - Smooth focus and hover transitions */
+.dashboard-search-input,
+.dashboard-sort-select,
+.dashboard-page-size-select {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-sort-button,
+.dashboard-pagination-button {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* URL List Items - Smooth hover effects */
+.dashboard-url-item, 
+.dashboard-url-title {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-url-item:hover {
+  transform: scale(1.01);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Text color transitions on hover */
+.dashboard-url-title,
+.dashboard-url-description {
+  transition: color 0s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Action buttons fade-in on hover */
+.dashboard-action-buttons {
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Action button hover effects */
+.dashboard-action-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-action-button:hover {
+  transform: scale(1.05);
+}
+
+/* Pagination button hover effects */
+.dashboard-pagination-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+/* Sort button hover effects */
+.dashboard-sort-button:hover {
+  transform: scale(1.05);
+}
+
+/* Smooth focus ring transitions */
+.dashboard-form-control:focus {
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode specific transitions */
+@media (prefers-color-scheme: dark) {
+  .dashboard-url-item:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-search-input,
+  .dashboard-sort-select,
+  .dashboard-page-size-select,
+  .dashboard-sort-button,
+  .dashboard-pagination-button,
+  .dashboard-url-item,
+  .dashboard-url-description,
+  .dashboard-action-buttons,
+  .dashboard-action-button {
+    transition: none;
+  }
+  
+  .dashboard-url-item:hover,
+  .dashboard-action-button:hover,
+  .dashboard-pagination-button:hover:not(:disabled),
+  .dashboard-sort-button:hover {
+    transform: none;
+  }
+}

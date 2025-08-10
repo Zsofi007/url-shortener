@@ -13,6 +13,7 @@ class Settings:
     DBNAME = os.getenv("DATABASE")
     DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}"
     
+    DEBUG: bool = os.getenv("DEBUG", "False") == "True"
     # Application settings
     BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8000")
     BASE_URL_FRONTEND: str = os.getenv("BASE_URL_FRONTEND", "http://localhost:5173")
