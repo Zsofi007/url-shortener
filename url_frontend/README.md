@@ -1,6 +1,31 @@
-# React + TypeScript + Vite
+# URL Shortener Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based frontend for the URL Shortener application, built with TypeScript, Vite, and Tailwind CSS.
+
+## Environment Variables
+
+This application requires the following environment variables to be set:
+
+- `VITE_API_BASE_URL`: The base URL for the backend API (defaults to `http://localhost:8000`)
+
+Create a `.env` file in the frontend directory with these variables, or set them in your system environment.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Building for Production
+
+```bash
+npm run build
+```
+
+## Docker
+
+See the root `DOCKER_README.md` for Docker setup instructions.
 
 Currently, two official plugins are available:
 

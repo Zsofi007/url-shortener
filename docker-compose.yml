@@ -1,0 +1,68 @@
+services:
+
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: url_shortener_backend
+    environment:
+      - DB_USER=${DB_USER}
+      - PASSWORD=${PASSWORD}
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - DATABASE=${DATABASE}
+      - DATABASE_URL=${DATABASE_URL}
+      - DEBUG=${DEBUG:-False}
+      - BASE_URL=${BASE_URL:-http://localhost:8000}
+      - BASE_URL_FRONTEND=${BASE_URL_FRONTEND:-http://localhost:3000}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY:-3600}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./url_frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${BASE_URL:-http://localhost:8000}
+    container_name: url_shortener_frontend
+    environment:
+      - VITE_API_BASE_URL=${BASE_URL:-http://localhost:8000}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+
+  # Redis for caching (optional, for future use)
+  redis:
+    image: redis:7-alpine
+    container_name: url_shortener_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - url_shortener_network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  url_shortener_network:
+    driver: bridge

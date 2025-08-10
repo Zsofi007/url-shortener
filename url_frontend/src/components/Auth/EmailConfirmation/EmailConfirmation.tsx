@@ -6,7 +6,7 @@ import { useToast } from '../../../shared/contexts/ToastContext';
 export const EmailConfirmation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { actions, state } = useAuthContext();
+  const { actions } = useAuthContext();
   const { showSuccess, showError, showInfo } = useToast();
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('');

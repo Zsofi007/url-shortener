@@ -7,6 +7,7 @@ from app.tasks.cleanup import startup_cleanup, periodic_cleanup
 from contextlib import asynccontextmanager
 import asyncio
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -40,11 +41,20 @@ app = FastAPI(lifespan=lifespan)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.BASE_URL_FRONTEND],  # Frontend URL
+    allow_origins=[
+        settings.BASE_URL_FRONTEND,  # Production frontend
+        "http://localhost:3000",     # Local development
+        "http://localhost:5173",     # Vite dev server
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Define health endpoint before including routers
+@app.get("/health/health")
+def health_check():
+    return {"status": "healthy", "port": os.getenv("PORT", "8000")}
 
 # Include routes
 app.include_router(url.router, prefix="", tags=["urls"])
