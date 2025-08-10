@@ -8,6 +8,7 @@ export interface ShortenedUrl {
   max_clicks: number;
   clicks: number;
   created_at: string;
+  qr_code_data?: string;
 }
 
 export interface ShortenUrlRequest {
@@ -21,6 +22,17 @@ export interface CustomUrlRequest {
   custom_code: string;
   expires_in_days?: number;
   max_clicks?: number;
+}
+
+export interface QrCodeRequest {
+  short_code: string;
+  size?: number;
+}
+
+export interface QrCodeResponse {
+  short_code: string;
+  qr_code_data: string;
+  short_url: string;
 }
 
 // Shorten a URL with custom limits
@@ -73,4 +85,26 @@ export const createCustomUrl = async (request: CustomUrlRequest): Promise<Shorte
     ...data,
     short_url: `${API_BASE_URL}/${data.short_code}`
   };
+};
+
+// Generate QR code for an existing short URL
+export const generateQrCode = async (request: QrCodeRequest): Promise<QrCodeResponse> => {
+  console.log('Generating QR code with request:', request);
+  const response = await fetch(`${API_BASE_URL}/api/qr-code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to generate QR code');
+  }
+
+  const data = await response.json();
+  console.log('QR code response:', data);
+  
+  return data;
 };
