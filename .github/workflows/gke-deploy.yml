@@ -124,10 +124,13 @@ jobs:
           tags: '${{ steps.meta_frontend.outputs.tags }}'
           labels: '${{ steps.meta_frontend.outputs.labels }}'
 
+      # Set up kustomize
+      - name: 'Set up Kustomize'
+        uses: imranismail/setup-kustomize
+
       # Deploy the Docker images to the GKE cluster
       - name: 'Deploy to GKE'
-      - uses: imranismail/setup-kustomize@v2
-      - run: |-
+        run: |-
           # Get the latest image tags from GHCR
           BACKEND_IMAGE="ghcr.io/${{ github.repository_owner }}/url-shortener-backend:${{ github.sha }}"
           FRONTEND_IMAGE="ghcr.io/${{ github.repository_owner }}/url-shortener-frontend:${{ github.sha }}"
