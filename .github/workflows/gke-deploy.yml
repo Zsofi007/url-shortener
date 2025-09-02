@@ -39,7 +39,7 @@ on:
 env:
   PROJECT_ID: 'url-shortener-470915' # Your Google Cloud project ID
   GKE_CLUSTER: 'autopilot-cluster-1' # TODO: update to your cluster name
-  GKE_ZONE: 'us-central1-a' # TODO: update to your cluster zone
+  GKE_ZONE: 'us-central1' # TODO: update to your cluster zone
   BACKEND_DEPLOYMENT_NAME: 'url-shortener-backend' # TODO: update to your backend deployment name
   FRONTEND_DEPLOYMENT_NAME: 'url-shortener-frontend' # TODO: update to your frontend deployment name
 
