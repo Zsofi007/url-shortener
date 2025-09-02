@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: url-shortener-backend-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: url-shortener-backend
   ports:
@@ -102,6 +102,9 @@ spec:
         image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/url-shortener/frontend:$IMAGE_TAG
         ports:
         - containerPort: 80
+        env:
+        - name: VITE_API_BASE_URL
+          value: "$BACKEND_URL"
         resources:
           requests:
             memory: "64Mi"

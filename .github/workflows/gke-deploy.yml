@@ -131,6 +131,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: '${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}'
           JWT_SECRET: '${{ secrets.JWT_SECRET }}'
           JWT_EXPIRY: '${{ secrets.JWT_EXPIRY }}'
+          VITE_API_BASE_URL: '${{ secrets.BACKEND_URL }}'
         run: |-
           # Get GKE credentials
           gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
