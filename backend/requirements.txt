@@ -6,5 +6,6 @@ python-multipart
 qrcode[pil]
 Pillow
 supabase
+python-dotenv
 # Production dependencies
 gunicorn
