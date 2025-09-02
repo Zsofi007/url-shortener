@@ -91,13 +91,6 @@ jobs:
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
 
-      # Get the GKE credentials so we can deploy to the cluster
-      - name: 'Set up GKE credentials'
-        uses: 'google-github-actions/get-gke-credentials@6051de21ad50fbb1767bc93c11357a49082ad116' # google-github-actions/get-gke-credentials@v2
-        with:
-          cluster_name: '${{ env.GKE_CLUSTER }}'
-          location: '${{ env.GKE_ZONE }}'
-
       # Set lowercase repository name for GHCR compatibility
       - name: 'Set lowercase repo name'
         id: 'repo_name'
