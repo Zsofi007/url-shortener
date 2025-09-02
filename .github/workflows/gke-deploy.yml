@@ -98,12 +98,18 @@ jobs:
           cluster_name: '${{ env.GKE_CLUSTER }}'
           location: '${{ env.GKE_ZONE }}'
 
+      # Set lowercase repository name for GHCR compatibility
+      - name: 'Set lowercase repo name'
+        id: 'repo_name'
+        run: |
+          echo "REPO_OWNER_LOWER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       # Build and push backend Docker image
       - name: 'Docker meta (backend)'
         id: 'meta_backend'
         uses: 'docker/metadata-action@v5'
         with:
-          images: 'ghcr.io/${{ github.repository_owner }}/url-shortener-backend'
+          images: 'ghcr.io/${{ steps.repo_name.outputs.REPO_OWNER_LOWER }}/url-shortener-backend'
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
@@ -123,7 +129,7 @@ jobs:
         id: 'meta_frontend'
         uses: 'docker/metadata-action@v5'
         with:
-          images: 'ghcr.io/${{ github.repository_owner }}/url-shortener-frontend'
+          images: 'ghcr.io/${{ steps.repo_name.outputs.REPO_OWNER_LOWER }}/url-shortener-frontend'
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
@@ -147,7 +153,8 @@ jobs:
           gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
           
           # Replace placeholders in resources.yaml
-          sed -i "s/REPO_OWNER/${{ github.repository_owner }}/g" resources.yaml
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s/REPO_OWNER/$REPO_OWNER_LOWER/g" resources.yaml
           sed -i "s/IMAGE_TAG/${{ github.sha }}/g" resources.yaml
           
           # Apply the resources
