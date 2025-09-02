@@ -45,6 +45,7 @@ app.add_middleware(
         settings.BASE_URL_FRONTEND,  # Production frontend
         "http://localhost:3000",     # Local development
         "http://localhost:5173",     # Vite dev server
+        "*",                         # Allow all origins for now (can be restricted later)
     ],
     allow_credentials=True,
     allow_methods=["*"],
