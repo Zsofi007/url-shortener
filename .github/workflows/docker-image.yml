@@ -6,9 +6,15 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GHCR_OWNER: ${{ github.repository_owner }}
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -28,7 +34,40 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push with docker-compose
-        run: |
-          docker compose build
-          docker compose push
+      - name: Docker meta (backend)
+        id: meta_backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/url-shortener-backend
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=sha,format=short
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta_backend.outputs.tags }}
+          labels: ${{ steps.meta_backend.outputs.labels }}
+
+      - name: Docker meta (frontend)
+        id: meta_frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/url-shortener-frontend
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=sha,format=short
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./url_frontend
+          file: ./url_frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta_frontend.outputs.tags }}
+          labels: ${{ steps.meta_frontend.outputs.labels }}

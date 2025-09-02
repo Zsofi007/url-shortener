@@ -2,6 +2,7 @@ services:
 
   # Backend API Service
   backend:
+    image: ghcr.io/${GHCR_OWNER}/url-shortener-backend:${TAG:-latest}
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -32,6 +33,7 @@ services:
 
   # Frontend Service
   frontend:
+    image: ghcr.io/${GHCR_OWNER}/url-shortener-frontend:${TAG:-latest}
     build:
       context: ./url_frontend
       dockerfile: Dockerfile
