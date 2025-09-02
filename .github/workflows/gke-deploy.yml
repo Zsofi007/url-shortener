@@ -124,23 +124,20 @@ jobs:
           tags: '${{ steps.meta_frontend.outputs.tags }}'
           labels: '${{ steps.meta_frontend.outputs.labels }}'
 
-      # Set up kustomize
-      - name: 'Set up Kustomize'
-        uses: imranismail/setup-kustomize@v2
-
-      # Deploy the Docker images to the GKE cluster
+      # Deploy to GKE
       - name: 'Deploy to GKE'
+        env:
+          GOOGLE_PROJECT: '${{ env.PROJECT_ID }}'
         run: |-
-          # Get the latest image tags from GHCR
-          BACKEND_IMAGE="ghcr.io/${{ github.repository_owner }}/url-shortener-backend:${{ github.sha }}"
-          FRONTEND_IMAGE="ghcr.io/${{ github.repository_owner }}/url-shortener-frontend:${{ github.sha }}"
+          # Get GKE credentials
+          gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
           
-          # Update kustomize with the new image tags
-          kustomize edit set image backend=$BACKEND_IMAGE
-          kustomize edit set image frontend=$FRONTEND_IMAGE
+          # Replace placeholders in resources.yaml
+          sed -i "s/REPO_OWNER/${{ github.repository_owner }}/g" resources.yaml
+          sed -i "s/IMAGE_TAG/${{ github.sha }}/g" resources.yaml
           
-          # Deploy to GKE
-          kustomize build . | kubectl apply -f -
+          # Apply the resources
+          kubectl apply -f resources.yaml
           
           # Wait for deployments to be ready
           kubectl rollout status deployment/${{ env.BACKEND_DEPLOYMENT_NAME }}
