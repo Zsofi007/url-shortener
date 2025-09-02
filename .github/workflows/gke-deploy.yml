@@ -146,7 +146,7 @@ jobs:
           gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
           
           # Replace placeholders in resources.yaml
-          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}")
+          REPO_OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           sed -i "s/REPO_OWNER/$REPO_OWNER_LOWER/g" resources.yaml
           sed -i "s/IMAGE_TAG/${{ github.sha }}/g" resources.yaml
           
