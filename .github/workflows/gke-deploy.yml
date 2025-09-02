@@ -121,6 +121,22 @@ jobs:
           sed -i "s/GOOGLE_PROJECT/${{ env.PROJECT_ID }}/g" resources.yaml
           sed -i "s/IMAGE_TAG/${{ github.sha }}/g" resources.yaml
           
+          # Replace environment variable placeholders with GitHub secrets
+          sed -i "s/DB_USER_VALUE/${{ secrets.DB_USER }}/g" resources.yaml
+          sed -i "s/PASSWORD_VALUE/${{ secrets.PASSWORD }}/g" resources.yaml
+          sed -i "s/HOST_VALUE/${{ secrets.HOST }}/g" resources.yaml
+          sed -i "s/PORT_VALUE/${{ secrets.PORT }}/g" resources.yaml
+          sed -i "s/DATABASE_VALUE/${{ secrets.DATABASE }}/g" resources.yaml
+          sed -i "s/DATABASE_URL_VALUE/${{ secrets.DATABASE_URL }}/g" resources.yaml
+          sed -i "s/DEBUG_VALUE/${{ secrets.DEBUG }}/g" resources.yaml
+          sed -i "s/BASE_URL_VALUE/${{ secrets.BASE_URL }}/g" resources.yaml
+          sed -i "s/BASE_URL_FRONTEND_VALUE/${{ secrets.BASE_URL_FRONTEND }}/g" resources.yaml
+          sed -i "s/SUPABASE_URL_VALUE/${{ secrets.SUPABASE_URL }}/g" resources.yaml
+          sed -i "s/SUPABASE_ANON_KEY_VALUE/${{ secrets.SUPABASE_ANON_KEY }}/g" resources.yaml
+          sed -i "s/SUPABASE_SERVICE_ROLE_KEY_VALUE/${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}/g" resources.yaml
+          sed -i "s/JWT_SECRET_VALUE/${{ secrets.JWT_SECRET }}/g" resources.yaml
+          sed -i "s/JWT_EXPIRY_VALUE/${{ secrets.JWT_EXPIRY }}/g" resources.yaml
+          
           # Apply the resources
           kubectl apply -f resources.yaml
           

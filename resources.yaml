@@ -45,12 +45,34 @@ spec:
         ports:
         - containerPort: 8000
         env:
+        - name: DB_USER
+          value: "DB_USER_VALUE"
+        - name: PASSWORD
+          value: "PASSWORD_VALUE"
+        - name: HOST
+          value: "HOST_VALUE"
+        - name: PORT
+          value: "PORT_VALUE"
+        - name: DATABASE
+          value: "DATABASE_VALUE"
         - name: DATABASE_URL
-          value: "postgresql://postgres:password@postgres:5432/urlshortener"
+          value: "DATABASE_URL_VALUE"
         - name: DEBUG
-          value: "False"
+          value: "DEBUG_VALUE"
         - name: BASE_URL
-          value: "https://your-domain.com"
+          value: "BASE_URL_VALUE"
+        - name: BASE_URL_FRONTEND
+          value: "BASE_URL_FRONTEND_VALUE"
+        - name: SUPABASE_URL
+          value: "SUPABASE_URL_VALUE"
+        - name: SUPABASE_ANON_KEY
+          value: "SUPABASE_ANON_KEY_VALUE"
+        - name: SUPABASE_SERVICE_ROLE_KEY
+          value: "SUPABASE_SERVICE_ROLE_KEY_VALUE"
+        - name: JWT_SECRET
+          value: "JWT_SECRET_VALUE"
+        - name: JWT_EXPIRY
+          value: "JWT_EXPIRY_VALUE"
         resources:
           requests:
             memory: "128Mi"
