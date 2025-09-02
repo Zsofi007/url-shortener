@@ -32,8 +32,9 @@ name: 'Build and Deploy to GKE'
 
 on:
   push:
-    branches:
-      - '"master"'
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 env:
   PROJECT_ID: 'url-shortener-470915' # Your Google Cloud project ID
