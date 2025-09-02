@@ -1,5 +1,6 @@
 import React from 'react';
 import { QrCodeDisplay } from '../QrCodeDisplay/QrCodeDisplay';
+import { useToast } from '../../../../shared/contexts/ToastContext';
 
 interface ShortenedUrl {
   short_code: string;
@@ -18,10 +19,38 @@ interface SuccessMessageProps {
 }
 
 export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset }) => {
+  const { showInfo } = useToast();
+
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
-      // You could add a toast notification here
+      // Check if the Clipboard API is available
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        showInfo('Copied to clipboard', 'The shortened URL has been copied to your clipboard.');
+
+        // You could add a toast notification here
+        console.log('Text copied successfully');
+      } else {
+        // Fallback method for non-HTTPS or unsupported browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          document.execCommand('copy');
+          console.log('Text copied using fallback method');
+          showInfo('Copied to clipboard', 'The shortened URL has been copied to your clipboard.');
+        } catch (fallbackErr) {
+          console.error('Fallback copy failed:', fallbackErr);
+        } finally {
+          document.body.removeChild(textArea);
+        }
+      }
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
