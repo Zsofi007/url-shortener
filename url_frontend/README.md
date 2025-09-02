@@ -8,7 +8,7 @@ This application requires the following environment variables to be set:
 
 - `VITE_API_BASE_URL`: The base URL for the backend API (defaults to `http://localhost:8000`)
 
-Create a `.env` file in the frontend directory with these variables, or set them in your system environment
+Create a `.env` file in the frontend directory with these variables, or set them in your system environment.
 
 ## Development
 
