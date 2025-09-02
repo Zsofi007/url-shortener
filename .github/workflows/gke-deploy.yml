@@ -106,7 +106,10 @@ jobs:
           GOOGLE_PROJECT: '${{ env.PROJECT_ID }}'
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
-          docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/url-shortener/frontend:${{ github.sha }} ./url_frontend
+          docker build \
+            --build-arg VITE_API_BASE_URL=http://url-shortener-backend-service:8000 \
+            -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/url-shortener/frontend:${{ github.sha }} \
+            ./url_frontend
           docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/url-shortener/frontend:${{ github.sha }}
 
       # Deploy to GKE

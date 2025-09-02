@@ -102,9 +102,6 @@ spec:
         image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/url-shortener/frontend:$IMAGE_TAG
         ports:
         - containerPort: 80
-        env:
-        - name: VITE_API_BASE_URL
-          value: "http://url-shortener-backend-service:8000"
         resources:
           requests:
             memory: "64Mi"
