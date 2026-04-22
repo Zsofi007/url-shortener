@@ -21,8 +21,8 @@ COPY . .
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:8000/health/health || exit 1
+  CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-8000}/health/health" || exit 1'
 
 # Production-like: multi-worker ASGI
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "30"]
+CMD ["sh", "-c", "gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 30"]
 
