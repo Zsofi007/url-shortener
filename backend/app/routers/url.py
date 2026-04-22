@@ -1,9 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.models.url import URL
-from app.models.requests import ShortenUrlRequest, CustomUrlRequest, UrlResponse, QrCodeRequest, QrCodeResponse
+from app.models.requests import (
+    ShortenUrlRequest,
+    CustomUrlRequest,
+    UrlResponse,
+    QrCodeRequest,
+    QrCodeResponse,
+    UserUrlsResponse,
+)
 from app.services.url_service import URLService
 from app.db import get_session
 from app.utils.auth_middleware import get_optional_user, get_required_user
+from app.utils.api_response import ApiResponse, ok
 from sqlmodel import Session
 from fastapi.responses import RedirectResponse
 from datetime import datetime
@@ -12,7 +20,7 @@ from typing import Optional, Dict, Any, List
 router = APIRouter()
 
 
-@router.post("/api/shorten", response_model=UrlResponse)
+@router.post("/api/shorten", response_model=ApiResponse[UrlResponse])
 async def shorten_url(
     request: ShortenUrlRequest, 
     session: Session = Depends(get_session),
@@ -31,10 +39,10 @@ async def shorten_url(
     """
     url_service = URLService(session)
     user_id = current_user["user_id"] if current_user else None
-    return url_service.shorten_url(request, user_id)
+    return ok(url_service.shorten_url(request, user_id))
 
 
-@router.post("/api/custom", response_model=UrlResponse)
+@router.post("/api/custom", response_model=ApiResponse[UrlResponse])
 async def create_custom_url(
     request: CustomUrlRequest, 
     session: Session = Depends(get_session),
@@ -54,10 +62,10 @@ async def create_custom_url(
     """
     url_service = URLService(session)
     user_id = current_user["user_id"] if current_user else None
-    return url_service.create_custom_url(request, user_id)
+    return ok(url_service.create_custom_url(request, user_id))
 
 
-@router.get("/api/urls", response_model=List[UrlResponse])
+@router.get("/api/urls", response_model=ApiResponse[UserUrlsResponse])
 async def list_user_urls(
     session: Session = Depends(get_session),
     current_user: Dict[str, Any] = Depends(get_required_user),
@@ -79,17 +87,17 @@ async def list_user_urls(
     Authentication is required - users can only see their own URLs
     """
     url_service = URLService(session)
-    return url_service.list_user_urls(
+    return ok(url_service.list_user_urls(
         user_id=current_user["user_id"],
         page=page,
         page_size=page_size,
         search=search,
         sort_by=sort_by,
         sort_order=sort_order
-    )
+    ))
 
 
-@router.get("/api/urls/count")
+@router.get("/api/urls/count", response_model=ApiResponse[int])
 async def get_user_urls_count(
     session: Session = Depends(get_session),
     current_user: Dict[str, Any] = Depends(get_required_user),
@@ -103,13 +111,13 @@ async def get_user_urls_count(
     Authentication is required - users can only see their own URL counts
     """
     url_service = URLService(session)
-    return url_service.get_user_urls_count(
+    return ok(url_service.get_user_urls_count(
         user_id=current_user["user_id"],
         search=search
-    )
+    ))
 
 
-@router.post("/api/qr-code", response_model=QrCodeResponse)
+@router.post("/api/qr-code", response_model=ApiResponse[QrCodeResponse])
 def generate_qr_code_for_url(request: QrCodeRequest, session: Session = Depends(get_session)):
     """
     Generate a QR code for an existing short URL
@@ -118,7 +126,7 @@ def generate_qr_code_for_url(request: QrCodeRequest, session: Session = Depends(
     - **size**: QR code size in pixels (100-500, default: 200)
     """
     url_service = URLService(session)
-    return url_service.generate_qr_code_for_url(request)
+    return ok(url_service.generate_qr_code_for_url(request))
 
 
 @router.get("/{short_code}")
@@ -148,15 +156,19 @@ def redirect_to_long_url(short_code: str, session: Session = Depends(get_session
     # Increment clicks and check if this click reaches the limit
     should_expire, long_url = url_service.increment_clicks_and_check_expiry(url_entry)
     
-    return RedirectResponse(long_url)
+    return RedirectResponse(
+        long_url,
+        status_code=302,
+        headers={"Cache-Control": "no-store"},
+    )
 
 
-@router.post("/api/cleanup")
+@router.post("/api/cleanup", response_model=ApiResponse[dict])
 def manual_cleanup(session: Session = Depends(get_session)):
     """
     Manually trigger cleanup of expired URLs
     Returns the number of URLs that were deleted
     """
     url_service = URLService(session)
-    return url_service.manual_cleanup()
+    return ok(url_service.manual_cleanup())
 

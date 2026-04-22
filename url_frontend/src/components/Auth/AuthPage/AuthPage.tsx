@@ -66,8 +66,8 @@ export const AuthPage: React.FC = () => {
       return false;
     }
     
-    if (mode === 'register' && formData.password.length < 6) {
-      showError('Validation Error', 'Password must be at least 6 characters long.');
+    if (mode === 'register' && formData.password.length < 8) {
+      showError('Validation Error', 'Password must be at least 8 characters long.');
       return false;
     }
     
@@ -111,7 +111,7 @@ export const AuthPage: React.FC = () => {
   if (showEmailSent) {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+        <div className="bg-white/80 dark:bg-slate-950/30 rounded-2xl shadow-xl border border-slate-200/70 dark:border-slate-800 p-4 sm:p-6 lg:p-8 backdrop-blur-md">
           <div className="text-center space-y-6">
             {/* Success Icon */}
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
@@ -146,7 +146,7 @@ export const AuthPage: React.FC = () => {
             <div className="space-y-3">
               <button
                 onClick={() => setShowEmailSent(false)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+                className="rounded-xl bg-indigo-600 text-white py-3 px-6 font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 transition-colors"
               >
                 Back to Login
               </button>
@@ -166,11 +166,11 @@ export const AuthPage: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+      <div className="bg-white/80 dark:bg-slate-950/30 rounded-2xl shadow-xl border border-slate-200/70 dark:border-slate-800 p-4 sm:p-6 lg:p-8 backdrop-blur-md">
         <div className="max-w-md mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
               {mode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
@@ -193,7 +193,7 @@ export const AuthPage: React.FC = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-4 py-3 border rounded-xl border-slate-300/80 dark:border-slate-700 bg-white/80 dark:bg-slate-950/30 text-slate-900 dark:text-slate-50 placeholder-slate-500 dark:placeholder-slate-400 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent backdrop-blur-sm"
                 placeholder="Enter your email"
                 disabled={isLoading}
               />
@@ -213,10 +213,16 @@ export const AuthPage: React.FC = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-4 py-3 border rounded-xl border-slate-300/80 dark:border-slate-700 bg-white/80 dark:bg-slate-950/30 text-slate-900 dark:text-slate-50 placeholder-slate-500 dark:placeholder-slate-400 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent backdrop-blur-sm"
                 placeholder="Enter your password"
                 disabled={isLoading}
+                aria-describedby={mode === 'register' ? 'password-help' : undefined}
               />
+              {mode === 'register' && (
+                <p id="password-help" className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                  Must be at least 8 characters. Use a mix of letters, numbers, and symbols for a stronger password.
+                </p>
+              )}
               {/* {errors.password && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
               )} */}
@@ -234,7 +240,7 @@ export const AuthPage: React.FC = () => {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
+                  className="w-full px-4 py-3 border rounded-xl border-slate-300/80 dark:border-slate-700 bg-white/80 dark:bg-slate-950/30 text-slate-900 dark:text-slate-50 placeholder-slate-500 dark:placeholder-slate-400 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent backdrop-blur-sm"
                   placeholder="Confirm your password"
                   disabled={isLoading}
                 />
@@ -248,11 +254,11 @@ export const AuthPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+              className="w-full rounded-xl bg-indigo-600 text-white py-3 px-6 font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 transition-colors"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
                   <span>{mode === 'login' ? 'Signing In...' : 'Creating Account...'}</span>
                 </div>
               ) : (
@@ -267,7 +273,7 @@ export const AuthPage: React.FC = () => {
               {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
               <button
                 onClick={handleModeToggle}
-                className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                className="ml-2 text-indigo-700 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium transition-colors duration-200"
                 disabled={isLoading}
               >
                 {mode === 'login' ? 'Sign up' : 'Sign in'}

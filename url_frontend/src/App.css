@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Intentionally minimal: keep global styles in `index.css`. */
+
+/* Vite starter styles removed (no longer needed). */
+
 #root {
   margin: 0 auto;
   padding: 0;
-  text-align: center;
 }
 
 .logo {

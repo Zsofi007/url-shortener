@@ -65,10 +65,10 @@ spec:
           value: "$BASE_URL_FRONTEND"
         - name: SUPABASE_URL
           value: "$SUPABASE_URL"
-        - name: SUPABASE_ANON_KEY
-          value: "$SUPABASE_ANON_KEY"
-        - name: SUPABASE_SERVICE_ROLE_KEY
-          value: "$SUPABASE_SERVICE_ROLE_KEY"
+        - name: SUPABASE_PUBLISHABLE_KEY
+          value: "$SUPABASE_PUBLISHABLE_KEY"
+        - name: SUPABASE_SECRET_KEY
+          value: "$SUPABASE_SECRET_KEY"
         - name: JWT_SECRET
           value: "$JWT_SECRET"
         - name: JWT_EXPIRY

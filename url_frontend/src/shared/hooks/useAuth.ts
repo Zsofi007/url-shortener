@@ -49,7 +49,7 @@ export const useAuth = () => {
               isLoading: false,
             }));
           }
-        } catch (error) {
+        } catch {
           // Token verification failed, clear it
           localStorage.removeItem('accessToken');
           setState(prev => ({
@@ -152,9 +152,8 @@ export const useAuth = () => {
     if (token) {
       try {
         await authApi.logout(token);
-      } catch (error) {
+      } catch {
         // Even if logout fails, clear local state
-        console.error('Logout error:', error);
       }
     }
     
@@ -206,7 +205,7 @@ export const useAuth = () => {
       setState(prev => ({ ...prev, error: errorMessage, isLoading: false }));
       throw error;
     }
-  }, []);
+  }, [logout]);
 
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));

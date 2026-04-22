@@ -28,8 +28,8 @@ VITE_API_BASE_URL=http://localhost:8000
 ### Supabase Configuration (Required)
 ```bash
 SUPABASE_URL=your_supabase_url_here
-SUPABASE_ANON_KEY=your_supabase_anon_key_here
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key_here
+SUPABASE_SECRET_KEY=your_supabase_secret_key_here
 ```
 
 ### JWT Configuration
@@ -71,8 +71,8 @@ VITE_API_BASE_URL=http://localhost:8000
 
 # Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+SUPABASE_SECRET_KEY=your_secret_key
 
 # JWT Configuration
 JWT_SECRET=your_secret_key_here

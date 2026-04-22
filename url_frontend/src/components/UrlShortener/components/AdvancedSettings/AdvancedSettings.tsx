@@ -60,12 +60,15 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
           </svg>
           <span>Advanced Settings</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {useCustomUrl && customCode ? customCode : expirationOptions.find(opt => opt.value === expiresInDays)?.label} • {clickOptions.find(opt => opt.value === maxClicks)?.label}
+        <div className="flex items-center space-x-2 min-w-0">
+          <span className="min-w-0 text-xs text-gray-500 dark:text-gray-400 truncate max-w-[12rem] sm:max-w-[18rem]">
+            {useCustomUrl && customCode
+              ? customCode
+              : expirationOptions.find(opt => opt.value === expiresInDays)?.label}{' '}
+            • {clickOptions.find(opt => opt.value === maxClicks)?.label}
           </span>
           <svg
-            className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${showAdvancedSettings ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${showAdvancedSettings ? 'rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

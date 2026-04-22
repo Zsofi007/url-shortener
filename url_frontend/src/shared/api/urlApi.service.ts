@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/api';
+import { parseApiResponse } from './apiClient';
 
 export interface ShortenedUrl {
   short_code: string;
@@ -86,26 +87,7 @@ export const getUserUrls = async (params: ListUrlsParams = {}): Promise<UserUrls
     headers: getAuthHeaders(),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to fetch user URLs');
-  }
-
-  const urls = await response.json();
-  
-  // Calculate pagination info
-  const total = await getUserUrlsCount(params.search);
-  const page = params.page || 1;
-  const page_size = params.page_size || 20;
-  const total_pages = Math.ceil(total / page_size);
-
-  return {
-    urls,
-    total,
-    page,
-    page_size,
-    total_pages
-  };
+  return parseApiResponse<UserUrlsResponse>(response);
 };
 
 // Get total count of user URLs
@@ -118,78 +100,42 @@ export const getUserUrlsCount = async (search?: string): Promise<number> => {
     headers: getAuthHeaders(),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to fetch URL count');
-  }
-
-  return response.json();
+  return parseApiResponse<number>(response);
 };
 
 // Shorten a URL with custom limits
 export const shortenUrl = async (request: ShortenUrlRequest): Promise<ShortenedUrl> => {
-  console.log('Shortening URL with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/shorten`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to shorten URL');
-  }
-
-  const data = await response.json();
-  console.log('Shorten URL response:', data);
+  const data = await parseApiResponse<ShortenedUrl>(response);
   
-  // Transform the response to include short_url
-  return {
-    ...data,
-    short_url: `${API_BASE_URL}/${data.short_code}`
-  };
+  return data;
 };
 
 // Create a custom URL with custom limits
 export const createCustomUrl = async (request: CustomUrlRequest): Promise<ShortenedUrl> => {
-  console.log('Creating custom URL with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/custom`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to create custom URL');
-  }
-
-  const data = await response.json();
-  console.log('Custom URL response:', data);
+  const data = await parseApiResponse<ShortenedUrl>(response);
   
-  // Transform the response to include short_url
-  return {
-    ...data,
-    short_url: `${API_BASE_URL}/${data.short_code}`
-  };
+  return data;
 };
 
 // Generate QR code for an existing short URL
 export const generateQrCode = async (request: QrCodeRequest): Promise<QrCodeResponse> => {
-  console.log('Generating QR code with request:', request);
   const response = await fetch(`${API_BASE_URL}/api/qr-code`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(request),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Failed to generate QR code');
-  }
-
-  const data = await response.json();
-  console.log('QR code response:', data);
-  
-  return data;
+  return parseApiResponse<QrCodeResponse>(response);
 };

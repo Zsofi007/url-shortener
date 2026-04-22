@@ -33,19 +33,6 @@ export const useUrlApi = () => {
     execute: getUserUrls
   } = useApi<ListUrlsParams, UserUrlsResponse>(urlApiService.getUserUrls);
 
-  // Get user URLs count - wrap to handle optional parameter
-  const {
-    loading: isUserUrlsCountLoading,
-    data: userUrlsCount,
-    error: userUrlsCountError,
-    execute: getUserUrlsCountExecute
-  } = useApi<string, number>((search: string) => urlApiService.getUserUrlsCount(search || undefined));
-
-  // Wrapper function to handle the optional parameter
-  const getUserUrlsCount = (search?: string) => {
-    return getUserUrlsCountExecute(search || '');
-  };
-
   return {
     state: {
       isUrlShortenerLoading,
@@ -57,15 +44,11 @@ export const useUrlApi = () => {
       isUserUrlsLoading,
       userUrls,
       userUrlsError,
-      isUserUrlsCountLoading,
-      userUrlsCount,
-      userUrlsCountError
     },
     actions: {
       shortenUrl,
       createCustomUrl,
       getUserUrls,
-      getUserUrlsCount
     }
   };
 }; 

@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/auth", "destination": "/" },
+    { "source": "/auth/register", "destination": "/" },
+    { "source": "/auth/confirm", "destination": "/" },
+    { "source": "/dashboard", "destination": "/" },
+
+    { "source": "/api/:path*", "destination": "https://short-api.abcd.com/api/:path*" },
+
+    { "source": "/:slug", "destination": "https://short-api.abcd.com/:slug" }
+  ]
+}
+

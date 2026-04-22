@@ -2,8 +2,10 @@
 Request models for URL shortener API
 """
 from pydantic import BaseModel, Field, validator
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime, timedelta
+
+from app.utils.url_validation import normalize_and_validate_http_url
 
 
 class ShortenUrlRequest(BaseModel):
@@ -24,10 +26,7 @@ class ShortenUrlRequest(BaseModel):
     
     @validator('long_url')
     def validate_long_url(cls, v):
-        """Ensure URL has proper protocol"""
-        if not v.startswith(('http://', 'https://')):
-            return f'https://{v}'
-        return v
+        return normalize_and_validate_http_url(v)
 
 
 class CustomUrlRequest(BaseModel):
@@ -54,10 +53,7 @@ class CustomUrlRequest(BaseModel):
     
     @validator('long_url')
     def validate_long_url(cls, v):
-        """Ensure URL has proper protocol"""
-        if not v.startswith(('http://', 'https://')):
-            return f'https://{v}'
-        return v
+        return normalize_and_validate_http_url(v)
     
     @validator('custom_code')
     def validate_custom_code(cls, v):
@@ -91,6 +87,14 @@ class QrCodeResponse(BaseModel):
     short_code: str = Field(..., description="The short code")
     qr_code_data: str = Field(..., description="Base64 encoded QR code image data")
     short_url: str = Field(..., description="The complete short URL")
+
+
+class UserUrlsResponse(BaseModel):
+    urls: List[UrlResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
 
 
 # Authentication Models

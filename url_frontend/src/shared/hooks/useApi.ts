@@ -30,7 +30,6 @@ export function useApi<T, S>(
             setData(response);
             result = response;
         } catch (err) {
-            console.log(err);
             setError(err as Error);
         } finally {
             setLoading(false);

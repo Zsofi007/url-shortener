@@ -8,6 +8,12 @@ from contextlib import asynccontextmanager
 import asyncio
 import logging
 import os
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.utils.api_response import fail, ok
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("App is starting up")
+    logger.info("App starting up")
     create_tables()
     
     # Run initial cleanup
@@ -28,7 +34,7 @@ async def lifespan(app: FastAPI):
 
     yield
     
-    print("App is shutting down")
+    logger.info("App shutting down")
     # Cancel background task
     cleanup_task.cancel()
     try:
@@ -38,15 +44,27 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Standardize error responses
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(_: Request, exc: StarletteHTTPException):
+    return JSONResponse(status_code=exc.status_code, content=fail(str(exc.detail)))
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_: Request, exc: RequestValidationError):
+    # Keep it human-readable for the UI; detailed errors can be logged later if needed
+    return JSONResponse(status_code=422, content=fail("Invalid request"))
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(_: Request, exc: Exception):
+    logger.exception("Unhandled error")
+    return JSONResponse(status_code=500, content=fail("Internal server error"))
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.BASE_URL_FRONTEND,  # Production frontend
-        "http://localhost:3000",     # Local development
-        "http://localhost:5173",     # Vite dev server
-        "*",                         # Allow all origins for now (can be restricted later)
-    ],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,7 +73,7 @@ app.add_middleware(
 # Define health endpoint before including routers
 @app.get("/health/health")
 def health_check():
-    return {"status": "healthy", "port": os.getenv("PORT", "8000")}
+    return ok({"status": "healthy", "port": os.getenv("PORT", "8000")})
 
 # Include routes
 app.include_router(url.router, prefix="", tags=["urls"])
@@ -64,4 +82,4 @@ app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello World"}
+    return ok({"message": "OK"})

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useDashboard } from './useDashboard';
 import { useToast } from '../../shared/contexts/ToastContext';
+import type { UserUrl } from '../../shared/api/urlApi.service';
+import { PUBLIC_BASE_URL } from '../../config/api';
 import './Dashboard.css';
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = React.memo(() => {
   const {
     state: {
       page,
@@ -32,12 +34,12 @@ export const Dashboard: React.FC = () => {
     try {
       await navigator.clipboard.writeText(text);
       showSuccess('URL copied to clipboard!', 'success');
-    } catch (err) {
+    } catch {
       showError('Failed to copy URL', 'error');
     }
   };
 
-  const getStatusBadge = (url: any) => {
+  const getStatusBadge = (url: UserUrl) => {
     if (url.expires_at && new Date(url.expires_at) < new Date()) {
       return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Expired</span>;
     }
@@ -178,17 +180,22 @@ export const Dashboard: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {urls.map((url) => (
+                  // Build the user-facing short link from the public base domain.
+                  // The backend's `short_url` may point to the API host in some environments.
                   <div
                     key={url.short_code}
                     className="dashboard-url-item group border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
                   >
+                    {(() => {
+                      const displayShortUrl = `${PUBLIC_BASE_URL}/${url.short_code}`;
+                      return (
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         {/* Header Row - Short Code and Status */}
                         <div className="flex items-center gap-3 mb-3">
                           <h3 className="dashboard-url-title text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
                             <span className="group-hover:hidden">{url.short_code}</span>
-                            <span className="hidden group-hover:inline">{url.short_url}</span>
+                            <span className="hidden group-hover:inline">{displayShortUrl}</span>
                           </h3>
                           {getStatusBadge(url)}
                         </div>
@@ -201,22 +208,22 @@ export const Dashboard: React.FC = () => {
                         </div>
                         
                         {/* Metadata Row - Stats with better spacing */}
-                        <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-                            <span className="font-medium">Created</span>
-                            <span>{formatDate(url.created_at)}</span>
+                            <span className="font-medium">Created:</span>
+                            <span className="text-gray-700 dark:text-gray-200">{formatDate(url.created_at)}</span>
                           </span>
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                            <span className="font-medium">Clicks</span>
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">{url.clicks}</span>
+                            <span className="font-medium">Clicks:</span>
+                            <span className="font-semibold text-gray-700 dark:text-gray-200">{url.clicks}</span>
                           </span>
                           {url.expires_at && (
                             <span className="flex items-center gap-2">
                               <span className="w-2 h-2 bg-orange-400 rounded-full"></span>
-                              <span className="font-medium">Expires</span>
-                              <span>{formatExpiryDate(url.expires_at)}</span>
+                              <span className="font-medium">Expiry:</span>
+                              <span className="text-gray-700 dark:text-gray-200">{formatExpiryDate(url.expires_at)}</span>
                             </span>
                           )}
                         </div>
@@ -225,13 +232,13 @@ export const Dashboard: React.FC = () => {
                       {/* Action Buttons - Right side */}
                       <div className="dashboard-action-buttons flex flex-col gap-2 ml-6 opacity-0 group-hover:opacity-100">
                         <button
-                          onClick={() => copyToClipboard(url.short_url)}
+                          onClick={() => copyToClipboard(displayShortUrl)}
                           className="dashboard-action-button px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 font-medium"
                         >
                           Copy
                         </button>
                         <a
-                          href={url.short_url}
+                          href={displayShortUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="dashboard-action-button px-4 py-2 text-sm bg-green-100 text-green-800 rounded-lg hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800 font-medium text-center"
@@ -240,6 +247,8 @@ export const Dashboard: React.FC = () => {
                         </a>
                       </div>
                     </div>
+                      );
+                    })()}
                   </div>
                 ))}
               </div>
@@ -279,4 +288,4 @@ export const Dashboard: React.FC = () => {
       </div>
     </div>
   );
-}; 
+});

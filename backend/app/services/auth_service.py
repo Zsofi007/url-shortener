@@ -6,6 +6,7 @@ from supabase import create_client, Client
 from fastapi import HTTPException
 from typing import Optional, Dict, Any
 from datetime import datetime
+import logging
 
 from app.config import settings
 from app.models.requests import (
@@ -21,12 +22,12 @@ class AuthService:
     
     def __init__(self):
         """Initialize Supabase client"""
-        if not all([settings.SUPABASE_URL, settings.SUPABASE_ANON_KEY]):
+        if not all([settings.SUPABASE_URL, settings.SUPABASE_PUBLISHABLE_KEY]):
             raise ValueError("Supabase configuration is incomplete. Check your environment variables.")
         
         self.supabase: Client = create_client(
             settings.SUPABASE_URL, 
-            settings.SUPABASE_ANON_KEY
+            settings.SUPABASE_PUBLISHABLE_KEY
         )
     
     async def register_user(self, request: UserRegistrationRequest) -> AuthResponse:
@@ -44,8 +45,8 @@ class AuthService:
         """
         try:
             # Attempt to sign up user
-            print(f"Registering user with email: {request.email}")
-            print(f"Redirect URL: {settings.BASE_URL_FRONTEND}/auth/confirm")
+            logger = logging.getLogger(__name__)
+            logger.info("Registering user")
             
             response = self.supabase.auth.sign_up({
                 "email": request.email,
@@ -54,10 +55,6 @@ class AuthService:
                     'email_redirect_to': f'{settings.BASE_URL_FRONTEND}/auth/confirm'
                 }
             })
-            
-            print(f"Supabase response: {response}")
-            print(f"User: {response.user}")
-            print(f"Session: {response.session}")
             
             user = response.user
             if not user:

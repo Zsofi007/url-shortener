@@ -15,6 +15,11 @@ export default tseslint.config([
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
+    rules: {
+      // This project exports hooks alongside providers in context files.
+      // Fast Refresh still works fine; keep lint signal focused on real issues.
+      'react-refresh/only-export-components': 'off',
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,

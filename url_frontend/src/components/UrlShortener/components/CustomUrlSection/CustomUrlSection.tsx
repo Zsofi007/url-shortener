@@ -1,5 +1,5 @@
 import React from 'react';
-import { API_BASE_URL } from '../../../../config/api';
+import { PUBLIC_BASE_URL } from '../../../../config/api';
 
 interface CustomUrlSectionProps {
   useCustomUrl: boolean;
@@ -16,6 +16,8 @@ export const CustomUrlSection: React.FC<CustomUrlSectionProps> = ({
   setCustomCode,
   loading,
 }) => {
+  const MAX_CUSTOM_CODE_LENGTH = 50;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center">
@@ -38,20 +40,21 @@ export const CustomUrlSection: React.FC<CustomUrlSectionProps> = ({
           <label htmlFor="custom-code-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Custom short code
           </label>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-500 dark:text-gray-400 px-3 py-3 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-l-xl">
-              {API_BASE_URL}/
+          <div className="flex items-stretch gap-2 min-w-0">
+            <span className="min-w-0 max-w-[45%] sm:max-w-none text-sm text-slate-500 dark:text-slate-400 px-3 py-3 bg-slate-100/80 dark:bg-slate-950/30 border border-slate-300/80 dark:border-slate-700 rounded-l-xl truncate">
+              {PUBLIC_BASE_URL}/
             </span>
             <input
               id="custom-code-input"
               type="text"
               value={customCode}
-              onChange={(e) => setCustomCode(e.target.value)}
+              onChange={(e) => setCustomCode(e.target.value.slice(0, MAX_CUSTOM_CODE_LENGTH))}
               placeholder="my-custom-link"
-              className="flex-1 px-3 sm:px-4 py-3 sm:py-4 text-slate-800 dark:text-gray-100 placeholder-slate-500 dark:placeholder-gray-400 border border-slate-300 dark:border-slate-600 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 dark:bg-slate-700 focus:bg-white dark:focus:bg-slate-600"
+              className="min-w-0 flex-1 px-3 sm:px-4 py-3 sm:py-4 text-slate-900 dark:text-slate-50 placeholder-slate-500 dark:placeholder-slate-400 border border-slate-300/80 dark:border-slate-700 rounded-r-xl bg-white/80 dark:bg-slate-950/30 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent backdrop-blur-sm"
               disabled={loading}
               aria-describedby="custom-code-help"
               pattern="[a-zA-Z0-9_-]{3,50}"
+              maxLength={MAX_CUSTOM_CODE_LENGTH}
             />
           </div>
           <p id="custom-code-help" className="mt-2 text-sm text-gray-500 dark:text-gray-400">

@@ -6,6 +6,9 @@ import type {
 } from './types.ts';
 
 import { API_BASE_URL } from '../../config/api';
+import { parseApiResponse } from './apiClient';
+
+type VerifyTokenResponse = { valid: boolean; user: unknown };
 
 // Helper function for API calls
 async function apiCall<T>(
@@ -20,12 +23,7 @@ async function apiCall<T>(
     ...options,
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+  return parseApiResponse<T>(response);
 }
 
 // Auth API functions
@@ -56,8 +54,8 @@ export const authApi = {
   },
 
   // Verify token
-  async verifyToken(token: string): Promise<{ valid: boolean; user: any }> {
-    return apiCall<{ valid: boolean; user: any }>('/api/auth/verify', {
+  async verifyToken(token: string): Promise<VerifyTokenResponse> {
+    return apiCall<VerifyTokenResponse>('/api/auth/verify', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

@@ -5,9 +5,10 @@ export const DarkModeToggleV3: React.FC = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   return (
-    <div
+    <button
+      type="button"
       onClick={toggleDarkMode}
-      className="cursor-pointer relative transition-all duration-500 ease-in-out"
+      className="relative transition-all duration-500 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
       style={{
         height: '32px', // Header-friendly size
         width: '64px',  // 2:1 ratio
@@ -16,9 +17,8 @@ export const DarkModeToggleV3: React.FC = () => {
         padding: '2px',
       }}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-pressed={isDarkMode}
       title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-      role="button"
-      tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -65,6 +65,6 @@ export const DarkModeToggleV3: React.FC = () => {
             `
         }}
       />
-    </div>
+    </button>
   );
 };

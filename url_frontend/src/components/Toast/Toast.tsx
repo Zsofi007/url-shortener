@@ -57,13 +57,13 @@ export const Toast: React.FC<ToastProps> = ({
   const getTypeStyles = () => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+        return 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800 sm:dark:bg-green-900/20';
       case 'error':
-        return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+        return 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 sm:dark:bg-red-900/20';
       case 'warning':
-        return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
+        return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800 sm:dark:bg-yellow-900/20';
       case 'info':
-        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
+        return 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 sm:dark:bg-blue-900/20';
     }
   };
 

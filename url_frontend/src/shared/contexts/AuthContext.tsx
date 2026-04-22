@@ -1,19 +1,25 @@
 import React, { createContext, useContext } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import type {
+  UserLoginRequest,
+  UserProfileResponse,
+  UserRegistrationRequest,
+  AuthResponse,
+} from '../api/types';
 
 interface AuthContextType {
   state: {
-    user: any;
+    user: UserProfileResponse | null;
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
   };
   actions: {
-    register: (data: any) => Promise<any>;
-    login: (data: any) => Promise<any>;
+    register: (data: UserRegistrationRequest) => Promise<AuthResponse>;
+    login: (data: UserLoginRequest) => Promise<AuthResponse>;
     logout: () => Promise<void>;
-    confirmEmail: (token: string) => Promise<any>;
+    confirmEmail: (token: string) => Promise<{ access_token: string; message: string }>;
     clearError: () => void;
   };
 }

@@ -54,12 +54,7 @@ export const useUrlShortener = () => {
   };
 
   useEffect(() => {
-    if (state.shortenedUrl) {
-      console.log(state.shortenedUrl);
-    }
-    if (state.customUrl) {
-      console.log(state.customUrl);
-    }
+    // Intentionally no-op: keep effect to make it easy to add analytics later
   }, [state.shortenedUrl, state.customUrl]);
 
   const reset = () => {

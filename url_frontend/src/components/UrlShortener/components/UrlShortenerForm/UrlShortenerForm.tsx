@@ -34,7 +34,7 @@ export const UrlShortenerForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div className="bg-white/80 dark:bg-slate-900/40 rounded-2xl shadow-xl border border-slate-200/70 dark:border-slate-700/60 p-4 sm:p-6 lg:p-8 backdrop-blur-md">
       <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
         {/* URL Input */}
         <UrlInput
@@ -64,11 +64,11 @@ export const UrlShortenerForm: React.FC = () => {
         <button
           type="submit"
           disabled={loading || !longUrl.trim() || (useCustomUrl && !customCode.trim())}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 sm:py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl"
+          className="w-full rounded-xl bg-indigo-600 text-white py-3 sm:py-4 px-6 font-semibold shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 transition-colors"
         >
           {loading ? (
             <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
               <span>{useCustomUrl ? 'Creating Custom URL...' : 'Shortening URL...'}</span>
             </div>
           ) : (

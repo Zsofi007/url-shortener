@@ -6,6 +6,7 @@ from app.config import settings
 from fastapi import APIRouter, Depends, HTTPException, Header, Request, Query
 from typing import Optional
 from fastapi.responses import RedirectResponse
+from app.utils.api_response import ApiResponse, ok
 
 from app.services.auth_service import AuthService
 from app.models.requests import (
@@ -22,7 +23,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 auth_service = AuthService()
 
 
-@router.post("/register", response_model=AuthResponse, status_code=201)
+@router.post("/register", response_model=ApiResponse[AuthResponse], status_code=201)
 async def register_user(request: UserRegistrationRequest):
     """
     Register a new user account
@@ -33,10 +34,10 @@ async def register_user(request: UserRegistrationRequest):
     Returns user info and access token if email already confirmed,
     otherwise returns user info with empty token until email confirmation.
     """
-    return await auth_service.register_user(request)
+    return ok(await auth_service.register_user(request))
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login", response_model=ApiResponse[AuthResponse])
 async def login_user(request: UserLoginRequest):
     """
     Authenticate user and create session
@@ -47,10 +48,10 @@ async def login_user(request: UserLoginRequest):
     Returns user info and access token for authenticated session.
     Email must be confirmed before login is allowed.
     """
-    return await auth_service.login_user(request)
+    return ok(await auth_service.login_user(request))
 
 
-@router.get("/profile", response_model=UserProfileResponse)
+@router.get("/profile", response_model=ApiResponse[UserProfileResponse])
 async def get_user_profile(authorization: Optional[str] = Header(None)):
     """
     Get current user's profile information
@@ -67,7 +68,7 @@ async def get_user_profile(authorization: Optional[str] = Header(None)):
         )
 
     token = authorization.replace("Bearer ", "")
-    return await auth_service.get_user_profile(token)
+    return ok(await auth_service.get_user_profile(token))
 
 
 @router.post("/logout")
@@ -87,7 +88,7 @@ async def logout_user(authorization: Optional[str] = Header(None)):
         )
 
     token = authorization.replace("Bearer ", "")
-    return await auth_service.logout_user(token)
+    return ok(await auth_service.logout_user(token))
 
 
 @router.get("/verify")
@@ -112,10 +113,7 @@ async def verify_token(authorization: Optional[str] = Header(None)):
     if not user_data:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-    return {
-        "valid": True,
-        "user": user_data
-    }
+    return ok({"valid": True, "user": user_data})
 
 
 @router.get("/confirm")
@@ -144,14 +142,14 @@ async def confirm_email(request: Request):
     try:
         user_data = await auth_service.verify_session(access_token)
         if user_data:
-            return {
+            return ok({
                 "message": "Email confirmed successfully!",
                 "user": user_data,
                 "access_token": access_token,
                 "token_type": token_type,
                 "expires_in": int(expires_in) if expires_in else None,
                 "note": "You can now use this access_token to authenticate API requests"
-            }
+            })
         else:
             raise HTTPException(status_code=400, detail="Invalid confirmation token")
     except Exception as e:

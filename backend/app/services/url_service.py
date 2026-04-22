@@ -5,7 +5,7 @@ from typing import Optional, List
 
 from app.models.url import URL
 from app.models.requests import ShortenUrlRequest, CustomUrlRequest, QrCodeRequest
-from app.models.requests import UrlResponse, QrCodeResponse
+from app.models.requests import UrlResponse, QrCodeResponse, UserUrlsResponse
 from app.utils.utils import encode_base62, generate_qr_code
 from app.tasks.cleanup import cleanup_expired_urls
 from app.config import settings
@@ -61,7 +61,7 @@ class URLService:
         search: Optional[str] = None,
         sort_by: str = "created_at",
         sort_order: str = "desc"
-    ) -> List[UrlResponse]:
+    ) -> UserUrlsResponse:
         """
         List all shortened URLs for a specific user with pagination, search, and sorting
         
@@ -125,7 +125,16 @@ class URLService:
                     short_url=short_url
                 ))
             
-            return result
+            total = self.get_user_urls_count(user_id=user_id, search=search)
+            total_pages = max(1, (total + page_size - 1) // page_size)
+
+            return UserUrlsResponse(
+                urls=result,
+                total=total,
+                page=page,
+                page_size=page_size,
+                total_pages=total_pages,
+            )
             
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error listing user URLs: {str(e)}")

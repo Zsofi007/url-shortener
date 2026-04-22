@@ -1,6 +1,7 @@
 import React from 'react';
 import { QrCodeDisplay } from '../QrCodeDisplay/QrCodeDisplay';
 import { useToast } from '../../../../shared/contexts/ToastContext';
+import { PUBLIC_BASE_URL } from '../../../../config/api';
 
 interface ShortenedUrl {
   short_code: string;
@@ -20,6 +21,7 @@ interface SuccessMessageProps {
 
 export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset }) => {
   const { showInfo } = useToast();
+  const displayShortUrl = `${PUBLIC_BASE_URL}/${data.short_code}`;
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -27,9 +29,6 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset })
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
         showInfo('Copied to clipboard', 'The shortened URL has been copied to your clipboard.');
-
-        // You could add a toast notification here
-        console.log('Text copied successfully');
       } else {
         // Fallback method for non-HTTPS or unsupported browsers
         const textArea = document.createElement('textarea');
@@ -43,16 +42,15 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset })
         
         try {
           document.execCommand('copy');
-          console.log('Text copied using fallback method');
           showInfo('Copied to clipboard', 'The shortened URL has been copied to your clipboard.');
-        } catch (fallbackErr) {
-          console.error('Fallback copy failed:', fallbackErr);
+        } catch {
+          // Intentionally swallow clipboard fallback errors; UI stays usable.
         } finally {
           document.body.removeChild(textArea);
         }
       }
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
+    } catch {
+      // Intentionally swallow clipboard errors; UI stays usable.
     }
   };
 
@@ -75,14 +73,14 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset })
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
           <input
             type="text"
-            value={data.short_url}
-            placeholder={data.short_url}
+            value={displayShortUrl}
+            placeholder={displayShortUrl}
             readOnly
             className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-900 dark:text-gray-100 font-mono bg-white dark:bg-slate-700 border border-green-300 dark:border-green-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             aria-label="Shortened URL"
           />
           <button
-            onClick={() => copyToClipboard(data.short_url)}
+            onClick={() => copyToClipboard(displayShortUrl)}
             className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 transition-all duration-300 font-medium whitespace-nowrap shadow-md hover:shadow-lg"
             aria-label="Copy shortened URL"
           >
@@ -129,7 +127,7 @@ export const SuccessMessage: React.FC<SuccessMessageProps> = ({ data, onReset })
       {data.qr_code_data && (
         <QrCodeDisplay
           qrCodeData={data.qr_code_data}
-          shortUrl={data.short_url}
+          shortUrl={displayShortUrl}
           shortCode={data.short_code}
         />
       )}

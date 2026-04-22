@@ -4,6 +4,7 @@ import type { ListUrlsParams } from '../../shared/api/urlApi.service';
 
 export const useDashboard = (initialPageSize: number = 20) => {
   const { state, actions } = useUrlApi();
+  const { getUserUrls } = actions;
 
   // Local state for pagination, search, and sorting
   const [page, setPage] = useState(1);
@@ -22,22 +23,13 @@ export const useDashboard = (initialPageSize: number = 20) => {
       sort_order: sortOrder
     };
     
-    await actions.getUserUrls(params);
-  }, [page, pageSize, search, sortBy, sortOrder, actions.getUserUrls]);
-
-  // Fetch count when search changes
-  const fetchCount = useCallback(async () => {
-    await actions.getUserUrlsCount(search.trim() || undefined);
-  }, [search]);
+    await getUserUrls(params);
+  }, [page, pageSize, search, sortBy, sortOrder, getUserUrls]);
 
   // Execute fetches when dependencies change
   useEffect(() => {
     fetchUrls();
   }, [fetchUrls]);
-
-  useEffect(() => {
-    fetchCount();
-  }, [fetchCount]);
 
   // Reset to page 1 when search or sorting changes
   useEffect(() => {
@@ -68,12 +60,11 @@ export const useDashboard = (initialPageSize: number = 20) => {
 
   const refresh = useCallback(() => {
     fetchUrls();
-    fetchCount();
-  }, [fetchUrls, fetchCount]);
+  }, [fetchUrls]);
 
   // Calculate pagination info
-  const total = state.userUrlsCount || 0;
-  const totalPages = Math.ceil(total / pageSize);
+  const total = state.userUrls?.total || 0;
+  const totalPages = state.userUrls?.total_pages || 1;
   const urls = state.userUrls?.urls || [];
 
   return {

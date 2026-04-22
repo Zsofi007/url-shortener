@@ -8,9 +8,53 @@ This document explains how to run the URL Shortener application using Docker and
 - Docker Compose installed on your system
 - Environment variables configured (see Environment Setup section)
 
-## Quick Start
+## Quick Start (2 modes)
 
-1. **Clone the repository and navigate to the project directory:**
+### A) Hot-reload dev (recommended while coding)
+
+This runs:
+- Postgres
+- FastAPI with `--reload`
+- Vite dev server with HMR
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose.dev.yml up --build
+```
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8000`
+
+### B) Production-like (build once, run like prod)
+
+This runs:
+- Postgres
+- FastAPI behind Gunicorn (multiple workers)
+- Nginx serving built frontend
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose.prod.yml up --build
+```
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+
+## Notes
+
+- **Database**: both modes run a local Postgres container. The backend uses `DATABASE_URL=postgresql://postgres:postgres@postgres:5432/urlshortener` by default inside Docker.
+- **Important**: if your root `.env` has `DATABASE_URL` pointing to Supabase (common), Docker would previously pick that up. Docker now uses **`DATABASE_URL_DOCKER`** instead, so local Compose keeps using the local Postgres by default.
+- **Use remote DB in Docker (optional)**: set `DATABASE_URL_DOCKER` in `.env` to your remote connection string.
+- **Stop everything**: `docker compose -f <file> down`
+- **Wipe DB** (destructive): `docker compose -f <file> down -v`
+
+## Legacy files
+
+The repo used to include `docker-compose.yml` and multiple Dockerfile variants. Those were replaced by:
+- `docker-compose.dev.yml`
+- `docker-compose.prod.yml`
+- `backend/Dockerfile` + `backend/Dockerfile.prod`
+- `url_frontend/Dockerfile.dev` + `url_frontend/Dockerfile`
    ```bash
    cd url-shortener
    ```
@@ -91,8 +135,8 @@ BASE_URL_FRONTEND=http://localhost:3000
 
 # Supabase Configuration
 SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_SECRET_KEY=your_supabase_secret_key
 
 # JWT Configuration
 JWT_SECRET=your_jwt_secret_key
