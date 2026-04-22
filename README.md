@@ -11,6 +11,7 @@ A production-minded URL shortener with:
 - Shorten URLs with **expiry** and **max click** limits
 - Optional **custom short codes**
 - **QR code** generation
+- Automatic **periodic cleanup** of expired / max-click URLs every 24 hours
 - Authenticated dashboard (list/search/sort URLs)
 
 ## Tech stack
