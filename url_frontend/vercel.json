@@ -5,9 +5,9 @@
     { "source": "/auth/confirm", "destination": "/" },
     { "source": "/dashboard", "destination": "/" },
 
-    { "source": "/api/:path*", "destination": "https://short-api.abcd.com/api/:path*" },
+    { "source": "/api/:path*", "destination": "https://short-api.zsofiakato.com/api/:path*" },
 
-    { "source": "/:slug", "destination": "https://short-api.abcd.com/:slug" }
+    { "source": "/:slug", "destination": "https://short-api.zsofiakato.com/:slug" }
   ]
 }
 
