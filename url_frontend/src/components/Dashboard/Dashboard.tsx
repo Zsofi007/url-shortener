@@ -217,7 +217,7 @@ export const Dashboard: React.FC = React.memo(() => {
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                             <span className="font-medium">Clicks:</span>
-                            <span className="font-semibold text-gray-700 dark:text-gray-200">{url.clicks}</span>
+                            <span className="font-semibold text-gray-700 dark:text-gray-200">{url.clicks} / {url.max_clicks}</span>
                           </span>
                           {url.expires_at && (
                             <span className="flex items-center gap-2">
